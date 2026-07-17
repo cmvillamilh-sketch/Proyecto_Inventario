@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { MaterialsService } from './materials.service';
 
 class CreateMaterialDto {
@@ -18,6 +19,7 @@ class UpdateMaterialDto {
 }
 
 @Controller('materials')
+@UseGuards(JwtAuthGuard)
 export class MaterialsController {
   constructor(private readonly materialsService: MaterialsService) {}
 

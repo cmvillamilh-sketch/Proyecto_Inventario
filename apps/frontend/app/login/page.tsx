@@ -40,21 +40,133 @@ export default function LoginPage() {
   }
 
   return (
-    <main style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', background: '#f4f6fb', fontFamily: 'sans-serif' }}>
-      <form onSubmit={handleSubmit} style={{ width: 360, padding: 24, borderRadius: 16, background: '#fff', boxShadow: '0 10px 30px rgba(0,0,0,0.08)' }}>
-        <h1 style={{ marginBottom: 24, textAlign: 'center' }}>ManteStock</h1>
-        <label style={{ display: 'block', marginBottom: 8 }}>Usuario</label>
-        <input value={username} onChange={(e) => setUsername(e.target.value)} style={{ width: '100%', padding: 10, marginBottom: 16, borderRadius: 8, border: '1px solid #cbd5e1' }} />
+    <main style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: '#f1f5f9', // Gris claro industrial
+      fontFamily: 'system-ui, -apple-system, sans-serif',
+      padding: '20px',
+      boxSizing: 'border-box'
+    }}>
+      <div style={{
+        width: '100%',
+        maxWidth: '400px',
+        backgroundColor: '#ffffff',
+        borderRadius: '12px',
+        border: '1px solid #cbd5e1',
+        padding: '40px 32px',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+        boxSizing: 'border-box'
+      }}>
+        {/* Header con estilo de Logotipo */}
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <div style={{
+            margin: '0 auto 16px auto',
+            display: 'flex',
+            height: '52px',
+            width: '52px',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: '50%',
+            backgroundColor: '#1d4ed8', // Azul industrial de marca
+            fontSize: '20px',
+            fontWeight: '700',
+            color: '#ffffff'
+          }}>
+            MS
+          </div>
+          <h1 style={{ fontSize: '26px', fontWeight: '700', color: '#0f172a', margin: '0' }}>
+            Mante-Stock
+          </h1>
+          <p style={{ fontSize: '14px', color: '#64748b', marginTop: '8px', margin: '8px 0 0 0' }}>
+            Control industrial de inventarios
+          </p>
+        </div>
 
-        <label style={{ display: 'block', marginBottom: 8 }}>Contraseña</label>
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} style={{ width: '100%', padding: 10, marginBottom: 20, borderRadius: 8, border: '1px solid #cbd5e1' }} />
+        {/* Formulario */}
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div>
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: '#334155', marginBottom: '8px' }}>
+              Usuario
+            </label>
+            <input
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Ingresa tu usuario"
+              style={{
+                width: '100%',
+                boxSizing: 'border-box',
+                borderRadius: '8px',
+                border: '1px solid #cbd5e1',
+                backgroundColor: '#f8fafc',
+                padding: '12px 14px',
+                fontSize: '15px',
+                color: '#0f172a',
+                outline: 'none',
+              }}
+            />
+          </div>
 
-        <button type="submit" disabled={loading} style={{ width: '100%', padding: 12, background: '#1f6feb', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer' }}>
-          {loading ? 'Ingresando...' : 'Iniciar sesión'}
-        </button>
+          <div>
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: '#334155', marginBottom: '8px' }}>
+              Contraseña
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Ingresa tu contraseña"
+              style={{
+                width: '100%',
+                boxSizing: 'border-box',
+                borderRadius: '8px',
+                border: '1px solid #cbd5e1',
+                backgroundColor: '#f8fafc',
+                padding: '12px 14px',
+                fontSize: '15px',
+                color: '#0f172a',
+                outline: 'none',
+              }}
+            />
+          </div>
 
-        {message ? <p style={{ marginTop: 16, color: message.includes('correcto') ? '#0a7f3e' : '#b42318', textAlign: 'center' }}>{message}</p> : null}
-      </form>
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              width: '100%',
+              borderRadius: '8px',
+              backgroundColor: '#1d4ed8',
+              padding: '14px',
+              fontSize: '15px',
+              fontWeight: '600',
+              color: '#ffffff',
+              border: 'none',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              opacity: loading ? 0.7 : 1,
+              marginTop: '10px'
+            }}
+          >
+            {loading ? 'Ingresando...' : 'Iniciar sesión'}
+          </button>
+        </form>
+
+        {/* Mensaje de error/éxito */}
+        {message ? (
+          <p style={{
+            marginTop: '20px',
+            textAlign: 'center',
+            fontSize: '14px',
+            color: message.includes('correcto') ? '#059669' : '#dc2626',
+            fontWeight: '600',
+            margin: '20px 0 0 0'
+          }}>
+            {message}
+          </p>
+        ) : null}
+      </div>
     </main>
   );
 }

@@ -1,21 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { MaterialsService } from './materials.service';
-
-class CreateMaterialDto {
-  code: string;
-  description: string;
-  category: string;
-  unitOfMeasure: string;
-  minimumStock: number;
-}
-
-class UpdateMaterialDto {
-  code?: string;
-  description?: string;
-  category?: string;
-  unitOfMeasure?: string;
-  minimumStock?: number;
-}
+import { CreateMaterialDto } from './dto/create-material.dto';
+import { UpdateMaterialDto } from './dto/update-material.dto';
 
 @Controller('materials')
 export class MaterialsController {

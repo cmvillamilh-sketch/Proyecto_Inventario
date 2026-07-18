@@ -1,25 +1,13 @@
-import { Body, Controller, Post, BadRequestException } from '@nestjs/common';
-
-class LoginDto {
-  username: string;
-  password: string;
-}
+import { Body, Controller, Post } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
+  constructor(private readonly authService: AuthService) {}
+
   @Post('login')
   login(@Body() body: LoginDto) {
-    if (!body.username || !body.password) {
-      throw new BadRequestException('username and password are required');
-    }
-
-    return {
-      accessToken: 'demo-token',
-      user: {
-        id: '1',
-        username: body.username,
-        role: 'coordinator',
-      },
-    };
+    return this.authService.login(body);
   }
 }

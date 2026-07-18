@@ -5,6 +5,7 @@ import * as path from 'path';
 import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
 import { MaterialsModule } from './materials/materials.module';
+import { InventoryMovementsModule } from './inventory-movements/inventory-movements.module';
 
 const envFilePath = [
   path.resolve(process.cwd(), '.env'),
@@ -27,6 +28,7 @@ const envFilePath = [
     }),
     AuthModule,
     MaterialsModule,
+    InventoryMovementsModule,
   ],
   controllers: [AppController],
   providers: [],

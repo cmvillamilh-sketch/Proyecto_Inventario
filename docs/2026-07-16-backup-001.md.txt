@@ -1,0 +1,232 @@
+# IA BACKUP
+Fecha: 2026-07-16
+Proyecto: ManteStock - Proyecto_Inventario
+Versión: Backup 001
+
+---
+
+# Estado actual
+
+Se clonó correctamente el repositorio del equipo.
+
+Ruta local:
+
+C:\Users\luisf\ManteStock\Proyecto_Inventario
+
+El proyecto original permanece intacto:
+
+C:\Users\luisf\ManteStock\mantestock-backend
+
+---
+
+# Arquitectura identificada
+
+Monorepo
+
+Proyecto_Inventario
+│
+├── apps
+│   ├── backend
+│   └── frontend
+│
+├── docker-compose.yml
+├── package.json
+└── documentación Markdown
+
+Frontend:
+- Next.js
+
+Backend:
+- NestJS 10
+- TypeORM
+- PostgreSQL
+
+NO utiliza Prisma.
+
+---
+
+# Auditoría realizada
+
+Se revisó:
+
+✔ package.json raíz
+
+✔ apps/backend
+
+✔ app.module.ts
+
+✔ typeorm.config.ts
+
+✔ materials.module.ts
+
+✔ materials.service.ts
+
+✔ materials.controller.ts
+
+---
+
+# Hallazgos
+
+El backend está en una etapa inicial.
+
+Actualmente:
+
+- existe estructura modular
+- existe conexión TypeORM
+- existe módulo Materials
+- existe módulo Auth
+
+Pero:
+
+- no existen entidades
+- no existen DTOs separados
+- no existen repositorios
+- no existe persistencia
+
+Materials funciona con un Array en memoria.
+
+---
+
+# Decisiones tomadas
+
+NO migrar Prisma.
+
+NO copiar el proyecto anterior.
+
+Utilizar el proyecto anterior únicamente como referencia técnica.
+
+Desarrollar siguiendo la arquitectura del equipo.
+
+---
+
+# Metodología IA
+
+ChatGPT
+
+- Arquitectura
+- Diseño
+- Documentación
+- Revisión
+- Diagramas
+- Explicaciones
+
+VS Code IA
+
+- Generar código
+- Refactorizar
+- Crear archivos
+- Autocompletar
+
+Gemini
+
+- Segunda opinión
+- Comparaciones
+- Documentación adicional
+
+---
+
+# Flujo de trabajo
+
+Analizar
+
+↓
+
+Diseñar
+
+↓
+
+Prompt para VS Code IA
+
+↓
+
+Generar código
+
+↓
+
+Revisión con ChatGPT
+
+↓
+
+Pruebas
+
+↓
+
+Commit
+
+---
+
+# Responsabilidad asignada
+
+Módulo:
+
+Inventario
+
+Módulo actual relacionado:
+
+materials
+
+Será la base del trabajo.
+
+---
+
+# Próximo objetivo
+
+Transformar Materials de:
+
+Controller
+↓
+Service
+↓
+Array
+
+a
+
+Controller
+↓
+Service
+↓
+Repository (TypeORM)
+↓
+PostgreSQL
+
+---
+
+# Diagramas creados
+
+✔ Arquitectura general del proyecto.
+
+Pendientes:
+
+- ERD
+- Flujo HTTP
+- Inventario
+- Git Flow
+- Autenticación
+
+---
+
+# Estado Git
+
+Repositorio clonado correctamente.
+
+Branch:
+
+main
+
+Estado:
+
+working tree clean
+
+---
+
+# Regla acordada
+
+No pedir a la IA módulos completos.
+
+Trabajar por tareas pequeñas.
+
+Toda generación de código será revisada antes de aceptarse.
+
+---
+
+# Fin del Backup

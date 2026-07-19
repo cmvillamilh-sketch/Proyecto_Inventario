@@ -1,5 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { LoginDto } from './dto/login.dto';
@@ -14,6 +15,7 @@ export class AuthService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async login(data: LoginDto) {
@@ -42,8 +44,15 @@ export class AuthService {
     user.lockedUntil = null;
     await this.userRepository.save(user);
 
+    const accessToken = this.jwtService.sign({
+      sub: user.id,
+      username: user.username,
+      role: user.role,
+    });
+
     return {
       message: 'Login exitoso',
+      accessToken,
       user: {
         id: user.id,
         username: user.username,

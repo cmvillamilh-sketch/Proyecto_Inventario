@@ -1,8 +1,10 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, UseGuards } from '@nestjs/common';
 import { InventoryMovementsService } from './inventory-movements.service';
 import { CreateInventoryMovementDto } from './dto/create-inventory-movement.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('inventory-movements')
+@UseGuards(JwtAuthGuard)
 export class InventoryMovementsController {
   constructor(private readonly inventoryMovementsService: InventoryMovementsService) {}
 
@@ -12,7 +14,7 @@ export class InventoryMovementsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.inventoryMovementsService.findOne(id);
   }
 

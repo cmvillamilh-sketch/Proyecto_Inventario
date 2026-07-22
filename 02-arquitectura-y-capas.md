@@ -1,5 +1,7 @@
 # Especificación 02: Arquitectura y Capas
 
+> **Nota (22/07/2026):** este documento describe la arquitectura **propuesta originalmente**. La implementación real coincide en las 4 capas y en los principios de diseño, con una corrección puntual: el ORM usado es **TypeORM**, no Prisma (ver Fase 2 más abajo). Se conserva el resto del documento porque describe fielmente lo construido — el detalle exacto de checkpoints y decisiones vivas está en `CLAUDE.md`.
+
 ## Arquitectura propuesta
 El sistema se compone de cuatro capas:
 
@@ -41,7 +43,7 @@ El sistema se compone de cuatro capas:
 
 ### Fase 2: Construcción del backend
 - crear módulos de autenticación, usuarios, materiales y movimientos
-- integrar Prisma o un ORM equivalente con PostgreSQL
+- integrar un ORM con PostgreSQL — **implementado con TypeORM** (no Prisma)
 - desarrollar servicios de entrada/salida con validación de stock
 - crear endpoints de consulta e historial
 - aplicar control de permisos por rol

@@ -7,3 +7,10 @@ export interface Material {
   minimumStock: number;
   currentStock: number;
 }
+
+export interface MaterialsSummary {
+  totalMaterials: number;
+  totalStockUnits: number;
+  lowStockCount: number;
+  lowStockMaterials: Material[];
+}

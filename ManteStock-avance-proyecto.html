@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ManteStock — Porcentajes de avance</title>
+<style>
+  :root {
+    --blue: #2563eb;
+    --blue-bg: #eff6ff;
+    --green: #1a7f37;
+    --green-bg: #e6f4ea;
+    --amber: #9a6700;
+    --amber-bg: #fff8e5;
+    --gray: #57606a;
+    --gray-bg: #f0f1f2;
+    --border: #d0d7de;
+    --text: #1f2328;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text);
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    line-height: 1.6;
+  }
+  h1 { font-size: 1.9rem; margin-bottom: 2px; }
+  .subtitle { color: var(--gray); margin-top: 0; }
+  h2 {
+    font-size: 1.25rem;
+    margin-top: 42px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--blue);
+    color: #111827;
+  }
+  .hero {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    background: var(--green-bg);
+    border: 1px solid #b7dfc3;
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin-top: 20px;
+  }
+  .hero-num {
+    font-size: 3.2rem;
+    font-weight: 800;
+    color: var(--green);
+    line-height: 1;
+  }
+  .hero-text { font-size: 0.95rem; color: #1f2937; }
+  .bar-track {
+    width: 100%;
+    height: 10px;
+    background: var(--gray-bg);
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 6px 0 4px;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--green);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 0.92rem;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  th { background: #f6f8fa; font-weight: 600; }
+  .pct-cell { width: 140px; }
+  .pct-num { font-weight: 700; font-size: 0.95rem; }
+  code {
+    background: #f6f8fa;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 0.88em;
+    border: 1px solid var(--border);
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+  .badge-dropped { background: var(--gray-bg); color: var(--gray); }
+  .note-box {
+    background: var(--blue-bg);
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 0.92rem;
+  }
+  .warn-box {
+    background: var(--amber-bg);
+    border: 1px solid #f0dca0;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 0.92rem;
+  }
+  ul { padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  .footer {
+    margin-top: 60px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 0.82rem;
+    color: var(--gray);
+  }
+</style>
+</head>
+<body>
+
+<h1>ManteStock — Porcentajes de avance</h1>
+<p class="subtitle">Al 21 de julio de 2026, sobre el alcance definido para la entrega del jueves</p>
+
+<div class="hero">
+  <div class="hero-num">100%</div>
+  <div class="hero-text">
+    de los <strong>5 módulos del alcance acordado para esta entrega</strong> (Materiales, Inventario y movimientos, Autenticación y usuarios, Trazabilidad y auditoría, Consulta y Dashboard) están completos y verificados con evidencia real — no solo por compilación.<br><br>
+    Notificaciones se descartó por decisión explícita, no cuenta como pendiente.
+  </div>
+</div>
+
+<h2>Avance por módulo</h2>
+<table>
+  <thead><tr><th>Módulo</th><th class="pct-cell">Avance</th><th>Evidencia</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>Catálogo de materiales</td>
+      <td class="pct-cell"><span class="pct-num">100%</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div></td>
+      <td>CRUD, unicidad de código, búsqueda por código/descripción. Verificado en navegador y Postman.</td>
+    </tr>
+    <tr>
+      <td>Inventario y movimientos</td>
+      <td class="pct-cell"><span class="pct-num">100%</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div></td>
+      <td>Entrada/salida/ajuste con transacción atómica, validación de stock, inmutabilidad. Verificado en navegador y Postman.</td>
+    </tr>
+    <tr>
+      <td>Autenticación y usuarios</td>
+      <td class="pct-cell"><span class="pct-num">100%</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div></td>
+      <td>Login con bloqueo, JWT, roles, CRUD de usuarios por API, rutas protegidas en frontend. 13/13 tests Postman + navegador.</td>
+    </tr>
+    <tr>
+      <td>Trazabilidad y auditoría</td>
+      <td class="pct-cell"><span class="pct-num">100%</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div></td>
+      <td>Historial por material y usuario, filtros por fecha/tipo/responsable, inmutabilidad. 10/10 tests Postman + navegador.</td>
+    </tr>
+    <tr>
+      <td>Consulta y dashboard</td>
+      <td class="pct-cell"><span class="pct-num">100%</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div></td>
+      <td>Indicadores, materiales con stock bajo, búsqueda. 4/4 tests Postman + navegador.</td>
+    </tr>
+    <tr>
+      <td>Notificaciones</td>
+      <td class="pct-cell"><span class="badge badge-dropped">Descartado</span></td>
+      <td>Decisión explícita del usuario (21/07/2026) — fuera del alcance de esta entrega.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Si se cuenta contra el alcance original completo (los 6 módulos de la especificación)</h2>
+<div class="hero" style="background:var(--blue-bg); border-color:#bfdbfe;">
+  <div class="hero-num" style="color:var(--blue);">83%</div>
+  <div class="hero-text">
+    5 de 6 módulos de <code>05-modulos-del-sistema.md</code> están completos. El único que falta (Notificaciones) fue descartado a propósito, no quedó a medias ni se abandonó por falta de tiempo.
+  </div>
+</div>
+
+<h2>Extras entregados, fuera de la especificación original</h2>
+<ul>
+  <li><strong>Mejora visual completa (checkpoint 010):</strong> todas las pantallas migradas a Tailwind CSS con un sistema de diseño consistente — la especificación no pedía una interfaz visual pulida, solo funcional.</li>
+  <li><strong>Guías funcionales</strong> para los roles Técnico y Administrador, y este mismo documento de seguimiento.</li>
+</ul>
+
+<h2>Pendientes menores (no bloquean la entrega)</h2>
+<div class="warn-box">
+  <ul>
+    <li><strong>Gestión de usuarios desde el navegador</strong> (crear, editar, resetear contraseña, desactivar) — el backend ya lo soporta y está probado, pero no existe la pantalla. Hoy se hace solo por API.</li>
+    <li><strong>13 commits sin subir a GitHub</strong> — decisión consciente de trabajar en local por ahora.</li>
+    <li><code>JWT_SECRET</code> de desarrollo (<code>change-me</code>) — reemplazar antes de cualquier despliegue real.</li>
+    <li>Detalles menores de estilo API: <code>/auth/login</code> devuelve <code>201</code> en vez de <code>200</code>; un admin puede autodegradar su propio rol sin bloqueo (sí está bloqueada la autodesactivación).</li>
+  </ul>
+</div>
+
+<div class="footer">
+  Porcentajes calculados sobre checkpoints validados con evidencia real (colecciones de Postman con tests automáticos y/o pruebas manuales en navegador confirmadas por el usuario), no sobre estimaciones. Fuente: <code>CLAUDE.md</code>, actualizado el 21/07/2026.
+</div>
+
+</body>
+</html>

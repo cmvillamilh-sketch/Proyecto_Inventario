@@ -2,22 +2,23 @@
 
 import { useRouter } from 'next/navigation';
 
-type Item = {
+type Movement = {
   id: string;
-  code: string;
-  description: string;
-  category: string;
-  stock: number;
-  minimumStock: number;
+  date: string;
+  material: {
+    id: string;
+    code: string;
+    description: string;
+  };
+  movementType: string;
+  quantity: number;
+  previousStock: number;
+  newStock: number;
+  user: string;
+  observation: string;
 };
 
-function statusFor(item: Item) {
-  if (item.stock <= 0) return { label: 'Crítico', color: '#ef4444' };
-  if (item.stock <= item.minimumStock) return { label: 'Bajo', color: '#f59e0b' };
-  return { label: 'Normal', color: '#10b981' };
-}
-
-export default function InventoryTable({ items }: { items: Item[] }) {
+export default function InventoryTable({ items }: { items: Movement[] }) {
   const router = useRouter();
 
   return (
@@ -25,36 +26,29 @@ export default function InventoryTable({ items }: { items: Item[] }) {
       <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff' }}>
         <thead>
           <tr style={{ textAlign: 'left', borderBottom: '1px solid #e6eef8' }}>
-            <th style={{ padding: 12 }}>Código</th>
-            <th style={{ padding: 12 }}>Descripción</th>
-            <th style={{ padding: 12 }}>Categoría</th>
-            <th style={{ padding: 12 }}>Stock</th>
-            <th style={{ padding: 12 }}>Stock mínimo</th>
-            <th style={{ padding: 12 }}>Estado</th>
-            <th style={{ padding: 12, width: 260 }}>Acciones</th>
+            <th style={{ padding: 14 }}>Fecha</th>
+            <th style={{ padding: 14 }}>Material</th>
+            <th style={{ padding: 14 }}>Tipo de movimiento</th>
+            <th style={{ padding: 14 }}>Cantidad</th>
+            <th style={{ padding: 14 }}>Stock anterior</th>
+            <th style={{ padding: 14 }}>Stock nuevo</th>
+            <th style={{ padding: 14 }}>Usuario</th>
+            <th style={{ padding: 14 }}>Observación</th>
           </tr>
         </thead>
         <tbody>
-          {items.map((it) => {
-            const s = statusFor(it);
-            return (
-              <tr key={it.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                <td style={{ padding: 12 }}>{it.code}</td>
-                <td style={{ padding: 12 }}>{it.description}</td>
-                <td style={{ padding: 12 }}>{it.category}</td>
-                <td style={{ padding: 12 }}>{it.stock}</td>
-                <td style={{ padding: 12 }}>{it.minimumStock}</td>
-                <td style={{ padding: 12 }}><span style={{ color: s.color, fontWeight: 700 }}>{s.label}</span></td>
-                <td style={{ padding: 12 }}>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <button onClick={() => router.push(`/inventory/movements`)} style={{ padding: '6px 10px', borderRadius: 8, border: 'none', background: '#0ea5e9', color: '#fff', cursor: 'pointer' }}>Ver movimiento</button>
-                    <button onClick={() => alert('Ajustar stock (simulado)')} style={{ padding: '6px 10px', borderRadius: 8, border: 'none', background: '#f59e0b', color: '#fff', cursor: 'pointer' }}>Ajustar stock</button>
-                    <button onClick={() => alert('Exportar (simulado)')} style={{ padding: '6px 10px', borderRadius: 8, border: 'none', background: '#64748b', color: '#fff', cursor: 'pointer' }}>Exportar</button>
-                  </div>
-                </td>
-              </tr>
-            );
-          })}
+          {items.map((item) => (
+            <tr key={item.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+              <td style={{ padding: 14 }}>{item.date}</td>
+              <td style={{ padding: 14 }}>{`${item.material.code} - ${item.material.description}`}</td>
+              <td style={{ padding: 14 }}>{item.movementType}</td>
+              <td style={{ padding: 14 }}>{item.quantity}</td>
+              <td style={{ padding: 14 }}>{item.previousStock}</td>
+              <td style={{ padding: 14 }}>{item.newStock}</td>
+              <td style={{ padding: 14 }}>{item.user}</td>
+              <td style={{ padding: 14 }}>{item.observation}</td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

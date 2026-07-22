@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiFetch } from '../../lib/api';
+import FormField from '../ui/FormField';
+import StatusBanner from '../ui/StatusBanner';
 
 type Props = {
   initial?: any;
@@ -15,71 +17,141 @@ export default function MaterialForm({ initial = {}, mode }: Props) {
     description: initial.description || '',
     category: initial.category || '',
     unitOfMeasure: initial.unitOfMeasure || '',
-    minimumStock: initial.minimumStock || 0,
+    minimumStock: initial.minimumStock ?? 0,
   });
 
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  async function handleSubmit(e: React.FormEvent) {
+  const router = useRouter();
+  const submitLabel = mode === 'new' ? 'Crear material' : 'Actualizar material';
+
+  const isFormValid = useMemo(() => {
+    return (
+      form.code.trim().length > 0 &&
+      form.description.trim().length > 0 &&
+      form.category.trim().length > 0 &&
+      form.unitOfMeasure.trim().length > 0 &&
+      Number.isFinite(form.minimumStock) &&
+      form.minimumStock >= 0
+    );
+  }, [form]);
+
+  function validate() {
+    const nextErrors: Record<string, string> = {};
+
+    if (!form.code.trim()) nextErrors.code = 'El código es obligatorio.';
+    if (!form.description.trim()) nextErrors.description = 'La descripción es obligatoria.';
+    if (!form.category.trim()) nextErrors.category = 'La categoría es obligatoria.';
+    if (!form.unitOfMeasure.trim()) nextErrors.unitOfMeasure = 'La unidad de medida es obligatoria.';
+    if (form.minimumStock === null || form.minimumStock === '' || Number.isNaN(form.minimumStock)) {
+      nextErrors.minimumStock = 'El stock mínimo debe ser un número válido.';
+    } else if (form.minimumStock < 0) {
+      nextErrors.minimumStock = 'El stock mínimo no puede ser negativo.';
+    }
+
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setMessage(null);
+
+    if (!validate()) return;
+
     setLoading(true);
-    setError(null);
     try {
       if (mode === 'new') {
         await apiFetch('/materials', {
           method: 'POST',
           body: JSON.stringify(form),
         });
-        router.push('/materials');
+        setMessage({ type: 'success', text: 'Material creado correctamente.' });
+        setTimeout(() => router.push('/materials'), 700);
       } else {
         await apiFetch(`/materials/${initial.id}`, {
           method: 'PUT',
           body: JSON.stringify(form),
         });
-        router.push('/materials');
+        setMessage({ type: 'success', text: 'Material actualizado correctamente.' });
+        setTimeout(() => router.push('/materials'), 700);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error');
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Error al guardar el material.' });
     } finally {
       setLoading(false);
     }
   }
 
+  function handleCancel() {
+    router.push('/materials');
+  }
+
   return (
-    <form onSubmit={handleSubmit} style={{ background: '#fff', padding: 18, borderRadius: 12, boxShadow: '0 8px 24px rgba(2,6,23,0.06)' }}>
-      <div style={{ display: 'grid', gap: 12 }}>
-        <div>
-          <label style={{ display: 'block', fontSize: 13, marginBottom: 6 }}>Código</label>
-          <input value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} style={{ width: '100%', padding: 10, borderRadius: 8, border: '1px solid #e2e8f0' }} />
-        </div>
+    <form onSubmit={handleSubmit} style={{ background: '#fff', padding: 24, borderRadius: 18, boxShadow: '0 14px 44px rgba(15, 23, 42, 0.08)' }}>
+      <div style={{ display: 'grid', gap: 22 }}>
+        {message ? <StatusBanner type={message.type} message={message.text} onClose={() => setMessage(null)} /> : null}
 
-        <div>
-          <label style={{ display: 'block', fontSize: 13, marginBottom: 6 }}>Descripción</label>
-          <input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} style={{ width: '100%', padding: 10, borderRadius: 8, border: '1px solid #e2e8f0' }} />
-        </div>
+        <div style={{ display: 'grid', gap: 18 }}>
+          <FormField label="Código" error={errors.code}>
+            <input
+              value={form.code}
+              onChange={(e) => setForm({ ...form, code: e.target.value })}
+              placeholder="MAT-001"
+              style={{ width: '100%', padding: 14, borderRadius: 12, border: '1px solid #cbd5e1' }}
+            />
+          </FormField>
 
-        <div style={{ display: 'flex', gap: 12 }}>
-          <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', fontSize: 13, marginBottom: 6 }}>Categoría</label>
-            <input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} style={{ width: '100%', padding: 10, borderRadius: 8, border: '1px solid #e2e8f0' }} />
+          <FormField label="Descripción" error={errors.description}>
+            <input
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              placeholder="Fusible 10A"
+              style={{ width: '100%', padding: 14, borderRadius: 12, border: '1px solid #cbd5e1' }}
+            />
+          </FormField>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
+            <FormField label="Categoría" error={errors.category}>
+              <input
+                value={form.category}
+                onChange={(e) => setForm({ ...form, category: e.target.value })}
+                placeholder="Eléctrico"
+                style={{ width: '100%', padding: 14, borderRadius: 12, border: '1px solid #cbd5e1' }}
+              />
+            </FormField>
+
+            <FormField label="U. Medida" error={errors.unitOfMeasure}>
+              <input
+                value={form.unitOfMeasure}
+                onChange={(e) => setForm({ ...form, unitOfMeasure: e.target.value })}
+                placeholder="unidad"
+                style={{ width: '100%', padding: 14, borderRadius: 12, border: '1px solid #cbd5e1' }}
+              />
+            </FormField>
           </div>
-          <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', fontSize: 13, marginBottom: 6 }}>U. Medida</label>
-            <input value={form.unitOfMeasure} onChange={(e) => setForm({ ...form, unitOfMeasure: e.target.value })} style={{ width: '100%', padding: 10, borderRadius: 8, border: '1px solid #e2e8f0' }} />
-          </div>
+
+          <FormField label="Stock mínimo" error={errors.minimumStock}>
+            <input
+              type="number"
+              value={form.minimumStock}
+              onChange={(e) => setForm({ ...form, minimumStock: Number(e.target.value) })}
+              min={0}
+              placeholder="0"
+              style={{ width: 200, padding: 14, borderRadius: 12, border: '1px solid #cbd5e1' }}
+            />
+          </FormField>
         </div>
 
-        <div>
-          <label style={{ display: 'block', fontSize: 13, marginBottom: 6 }}>Stock mínimo</label>
-          <input type="number" value={form.minimumStock} onChange={(e) => setForm({ ...form, minimumStock: Number(e.target.value) })} style={{ width: 140, padding: 10, borderRadius: 8, border: '1px solid #e2e8f0' }} />
-        </div>
-
-        {error ? <div style={{ color: '#b42318' }}>{error}</div> : null}
-
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button type="submit" disabled={loading} style={{ padding: '10px 14px', borderRadius: 8, border: 'none', background: '#0ea5e9', color: '#fff', cursor: 'pointer' }}>{loading ? 'Guardando...' : 'Guardar'}</button>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
+          <button type="button" onClick={handleCancel} style={{ padding: '12px 18px', borderRadius: 12, border: '1px solid #cbd5e1', background: '#fff', color: '#0f172a', cursor: 'pointer' }}>
+            Cancelar
+          </button>
+          <button type="submit" disabled={loading || !isFormValid} style={{ padding: '12px 18px', borderRadius: 12, border: 'none', background: loading ? '#94a3b8' : '#0ea5e9', color: '#fff', cursor: loading ? 'not-allowed' : 'pointer' }}>
+            {loading ? 'Guardando...' : submitLabel}
+          </button>
         </div>
       </div>
     </form>

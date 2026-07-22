@@ -1,55 +1,67 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Material } from './material.entity';
+import { CreateMaterialDto } from './dto/create-material.dto';
+import { UpdateMaterialDto } from './dto/update-material.dto';
 
 @Injectable()
 export class MaterialsService {
-  private materials = [
-    {
-      id: '1',
-      code: 'MAT-001',
-      description: 'Fusible 10A',
-      category: 'Eléctrico',
-      unitOfMeasure: 'unidad',
-      minimumStock: 5,
-      currentStock: 12,
-    },
-  ];
+  constructor(
+    @InjectRepository(Material)
+    private readonly materialRepository: Repository<Material>,
+  ) {}
 
-  findAll() {
-    return this.materials;
+  async findAll() {
+    return await this.materialRepository.find();
   }
 
-  findOne(id: string) {
-    return this.materials.find((material) => material.id === id);
+  async findOne(id: string) {
+    const material = await this.materialRepository.findOne({ where: { id } });
+    if (!material) {
+      throw new NotFoundException('Material no encontrado');
+    }
+    return material;
   }
 
-  create(data: any) {
-    const newMaterial = {
-      id: String(this.materials.length + 1),
+  async create(data: CreateMaterialDto) {
+    const existing = await this.materialRepository.findOne({ where: { code: data.code } });
+    if (existing) {
+      throw new BadRequestException('El código del material ya existe');
+    }
+
+    const newMaterial = this.materialRepository.create({
       ...data,
       currentStock: 0,
-    };
+    });
 
-    this.materials.push(newMaterial);
-    return newMaterial;
+    return await this.materialRepository.save(newMaterial);
   }
 
-  update(id: string, data: any) {
-    const index = this.materials.findIndex((material) => material.id === id);
-    if (index === -1) return null;
+  async update(id: string, data: UpdateMaterialDto) {
+    const material = await this.materialRepository.findOne({ where: { id } });
+    if (!material) {
+      throw new NotFoundException('Material no encontrado');
+    }
 
-    this.materials[index] = {
-      ...this.materials[index],
-      ...data,
-    };
+    if (data.code && data.code !== material.code) {
+      const duplicate = await this.materialRepository.findOne({ where: { code: data.code } });
+      if (duplicate) {
+        throw new BadRequestException('El código del material ya existe');
+      }
+    }
 
-    return this.materials[index];
+    Object.assign(material, data);
+    return await this.materialRepository.save(material);
   }
 
-  remove(id: string) {
-    const index = this.materials.findIndex((material) => material.id === id);
-    if (index === -1) return null;
+  async remove(id: string) {
+    const material = await this.materialRepository.findOne({ where: { id } });
+    if (!material) {
+      throw new NotFoundException('Material no encontrado');
+    }
 
-    const [removed] = this.materials.splice(index, 1);
-    return removed;
+    await this.materialRepository.remove(material);
+    return material;
   }
 }

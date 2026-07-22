@@ -32,9 +32,16 @@ export default async function InventoryMovementsPage({ searchParams }: Inventory
   ]);
 
   return (
-    <main>
-      <h1>Movimientos de inventario</h1>
-      <Link href="/inventory-movements/new">Nuevo movimiento</Link>
+    <main className="max-w-6xl mx-auto px-6 py-8">
+      <h1 className="text-2xl font-semibold text-gray-900 mb-6">Movimientos de inventario</h1>
+      <div className="mb-6">
+        <Link
+          href="/inventory-movements/new"
+          className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+        >
+          Nuevo movimiento
+        </Link>
+      </div>
       <InventoryMovementFilters materials={materials} currentFilters={searchParams} />
       <InventoryMovementList movements={movements} />
     </main>

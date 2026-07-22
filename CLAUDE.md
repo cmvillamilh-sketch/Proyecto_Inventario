@@ -147,7 +147,9 @@ Backend validado con colección de Postman (`postman/ManteStock-009-Dashboard.po
 
 Checkpoints 007 (Autenticación), 008 (Trazabilidad y auditoría) y 009 (Consulta y Dashboard) completos y verificados — commits pendientes de confirmar.
 
-**Los 5 módulos del alcance de esta entrega (Materiales, Inventory Movements, Autenticación, Trazabilidad/auditoría, Consulta/Dashboard) están al 100%.** Notificaciones queda descartado (decisión del 21/07/2026, no es un pendiente). Falta: confirmar todos los commits pendientes, y decidir con el usuario si se hace una revisión final / documento de entrega para el jueves.
+**Los 5 módulos del alcance de esta entrega (Materiales, Inventory Movements, Autenticación, Trazabilidad/auditoría, Consulta/Dashboard) están al 100%.** Notificaciones queda descartado (decisión del 21/07/2026, no es un pendiente).
+
+**Decisión (22/07/2026): se subió el trabajo a GitHub, pero en una rama, no a `main`.** Se detectó una discrepancia con la metodología del curso (bitácora del profesor Andrés Sánchez, `ManteStock_Backup_2026-07-15.md`): exige Gitflow — nunca commitear directo a `main`, siempre rama + Pull Request + Code Review. Los 13 commits que estaban solo en `main` local se movieron a la rama `feature/checkpoints-007-010`, ya pusheada a `origin/feature/checkpoints-007-010`. `origin/main` sigue intacto (solo el commit inicial) — el merge a `main` vía Pull Request queda pendiente, a decidir cuándo hacerlo.
 
 ---
 
@@ -248,6 +250,20 @@ Al probar el flujo completo en el navegador como `tecnico1`, crear un material f
 Probado manualmente por el usuario (no solo `next build`): login redirige correctamente, cookie de sesión funciona, middleware bloquea rutas sin sesión, header muestra username/role, link "Usuarios" solo visible para ADMIN, `/users` redirige si un no-admin intenta entrar por URL directa, logout limpia la sesión. Creación de material y de movimiento de inventario como `tecnico1` confirmadas de punta a punta (esto último ya incluye el fix del bug de Material de arriba). Pendiente de commitear.
 
 Durante la verificación se encontró y corrigió un bug adicional (router cache del cliente): `LoginForm.tsx` y `LogoutButton.tsx` no llamaban `router.refresh()` antes de navegar, así que el header (en `app/layout.tsx`) seguía mostrando el estado viejo tras login/logout — mismo patrón que el bug ya documentado del 19/07/2026 en `MaterialForm`/`InventoryMovementForm`. Corregido agregando `router.refresh()` en ambos.
+
+## Checkpoint 010 — Mejora visual del frontend (arquitectura, 21/07/2026)
+
+Hasta ahora el frontend es HTML sin ningún estilo (cero CSS en todo `apps/frontend`). Decisión del usuario: mejorar la interfaz de **todas** las pantallas (no solo las de la demo), usando **Tailwind CSS** (instalación nueva, `tailwindcss@3` + `postcss` + `autoprefixer`, config estándar de Next.js App Router).
+
+Es un cambio **puramente visual** — no debe tocar lógica, nombres de campos (`name`/`id` de inputs), llamadas a servicios, ni props de componentes. Solo se agregan `className` y se ajusta estructura de JSX para layout (envolver en `div`s, por ejemplo).
+
+Sistema de diseño acordado (para que quede consistente entre archivos):
+- Color primario: azul (`blue-600`). Peligro/eliminar: `red-600`. Éxito/entrada: `green-600`. Alerta/stock bajo: `amber-500`/`amber-600`.
+- Botones: primario sólido azul, secundario con borde gris, peligro rojo — todos con estado `disabled` visualmente distinto.
+- Tablas: encabezado gris claro, filas con hover, bordes redondeados.
+- Formularios: labels arriba del input, inputs con borde y foco azul, errores en caja roja clara.
+- Tarjetas del dashboard: fondo blanco, borde gris, sombra sutil.
+- Filas de material con `currentStock <= minimumStock` resaltadas (fondo ámbar claro) en las tablas donde aplique — refuerzo visual del indicador de stock bajo.
 
 ## Pendientes por verificar (abiertos, sin confirmar aún)
 

@@ -68,32 +68,81 @@ export default function MaterialForm({ initialData }: MaterialFormProps) {
     }
   };
 
+  const fieldClassName =
+    'block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none';
+  const labelClassName = 'block text-sm font-medium text-gray-700 mb-1';
+
   return (
     <form onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor="code">Código</label>
-        <input id="code" name="code" value={form.code} onChange={handleChange} disabled={isSubmitting} />
+      <div className="mb-4">
+        <label htmlFor="code" className={labelClassName}>
+          Código
+        </label>
+        <input id="code" name="code" value={form.code} onChange={handleChange} disabled={isSubmitting} className={fieldClassName} />
       </div>
-      <div>
-        <label htmlFor="description">Descripción</label>
-        <input id="description" name="description" value={form.description} onChange={handleChange} disabled={isSubmitting} />
+      <div className="mb-4">
+        <label htmlFor="description" className={labelClassName}>
+          Descripción
+        </label>
+        <input
+          id="description"
+          name="description"
+          value={form.description}
+          onChange={handleChange}
+          disabled={isSubmitting}
+          className={fieldClassName}
+        />
       </div>
-      <div>
-        <label htmlFor="category">Categoría</label>
-        <input id="category" name="category" value={form.category} onChange={handleChange} disabled={isSubmitting} />
+      <div className="mb-4">
+        <label htmlFor="category" className={labelClassName}>
+          Categoría
+        </label>
+        <input
+          id="category"
+          name="category"
+          value={form.category}
+          onChange={handleChange}
+          disabled={isSubmitting}
+          className={fieldClassName}
+        />
       </div>
-      <div>
-        <label htmlFor="unitOfMeasure">Unidad</label>
-        <input id="unitOfMeasure" name="unitOfMeasure" value={form.unitOfMeasure} onChange={handleChange} disabled={isSubmitting} />
+      <div className="mb-4">
+        <label htmlFor="unitOfMeasure" className={labelClassName}>
+          Unidad
+        </label>
+        <input
+          id="unitOfMeasure"
+          name="unitOfMeasure"
+          value={form.unitOfMeasure}
+          onChange={handleChange}
+          disabled={isSubmitting}
+          className={fieldClassName}
+        />
       </div>
-      <div>
-        <label htmlFor="minimumStock">Stock mínimo</label>
-        <input id="minimumStock" name="minimumStock" type="number" value={form.minimumStock} onChange={handleChange} disabled={isSubmitting} />
+      <div className="mb-4">
+        <label htmlFor="minimumStock" className={labelClassName}>
+          Stock mínimo
+        </label>
+        <input
+          id="minimumStock"
+          name="minimumStock"
+          type="number"
+          value={form.minimumStock}
+          onChange={handleChange}
+          disabled={isSubmitting}
+          className={fieldClassName}
+        />
       </div>
-      <button type="submit" disabled={isSubmitting}>
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
         {isSubmitting ? 'Guardando...' : 'Guardar'}
       </button>
-      {errorMessage ? <p>{errorMessage}</p> : null}
+      {errorMessage ? (
+        <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{errorMessage}</p>
+      ) : null}
     </form>
   );
 }

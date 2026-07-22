@@ -80,10 +80,16 @@ export default function InventoryMovementForm() {
     }
   };
 
+  const fieldClassName =
+    'block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none';
+  const labelClassName = 'block text-sm font-medium text-gray-700 mb-1';
+
   return (
     <form onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor="materialId">Material</label>
+      <div className="mb-4">
+        <label htmlFor="materialId" className={labelClassName}>
+          Material
+        </label>
         <select
           id="materialId"
           name="materialId"
@@ -91,6 +97,7 @@ export default function InventoryMovementForm() {
           onChange={handleChange}
           disabled={isSubmitting || isLoading}
           required
+          className={fieldClassName}
         >
           <option value="" disabled>
             {isLoading ? 'Cargando materiales...' : 'Seleccione un material'}
@@ -102,9 +109,18 @@ export default function InventoryMovementForm() {
           ))}
         </select>
       </div>
-      <div>
-        <label htmlFor="type">Tipo</label>
-        <select id="type" name="type" value={form.type} onChange={handleChange} disabled={isSubmitting}>
+      <div className="mb-4">
+        <label htmlFor="type" className={labelClassName}>
+          Tipo
+        </label>
+        <select
+          id="type"
+          name="type"
+          value={form.type}
+          onChange={handleChange}
+          disabled={isSubmitting}
+          className={fieldClassName}
+        >
           {movementTypeOptions.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
@@ -112,8 +128,10 @@ export default function InventoryMovementForm() {
           ))}
         </select>
       </div>
-      <div>
-        <label htmlFor="quantity">Cantidad</label>
+      <div className="mb-4">
+        <label htmlFor="quantity" className={labelClassName}>
+          Cantidad
+        </label>
         <input
           id="quantity"
           name="quantity"
@@ -122,16 +140,32 @@ export default function InventoryMovementForm() {
           value={form.quantity}
           onChange={handleChange}
           disabled={isSubmitting}
+          className={fieldClassName}
         />
       </div>
-      <div>
-        <label htmlFor="reason">Motivo</label>
-        <input id="reason" name="reason" value={form.reason} onChange={handleChange} disabled={isSubmitting} />
+      <div className="mb-4">
+        <label htmlFor="reason" className={labelClassName}>
+          Motivo
+        </label>
+        <input
+          id="reason"
+          name="reason"
+          value={form.reason}
+          onChange={handleChange}
+          disabled={isSubmitting}
+          className={fieldClassName}
+        />
       </div>
-      <button type="submit" disabled={isSubmitting || isLoading}>
+      <button
+        type="submit"
+        disabled={isSubmitting || isLoading}
+        className="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
         {isSubmitting ? 'Guardando...' : 'Guardar'}
       </button>
-      {errorMessage ? <p>{errorMessage}</p> : null}
+      {errorMessage ? (
+        <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{errorMessage}</p>
+      ) : null}
     </form>
   );
 }

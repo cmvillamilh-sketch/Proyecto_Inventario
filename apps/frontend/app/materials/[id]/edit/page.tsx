@@ -19,8 +19,8 @@ export default async function EditMaterialPage({ params }: EditMaterialPageProps
   const material = await getMaterialById(params.id, auth.token);
 
   return (
-    <main>
-      <h1>Editar material</h1>
+    <main className="max-w-5xl mx-auto px-6 py-8">
+      <h1 className="text-2xl font-semibold text-gray-900 mb-6">Editar material</h1>
       <MaterialForm initialData={material} />
     </main>
   );

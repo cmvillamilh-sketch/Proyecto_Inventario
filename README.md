@@ -21,7 +21,16 @@ ManteStock busca reemplazar ese flujo manual por una herramienta web con una ún
 - Validar que no exista stock negativo
 - Mantener trazabilidad completa por usuario y fecha/hora
 - Consultar stock disponible en tiempo real
-- Diferenciar permisos por rol entre técnico y coordinador
+- Diferenciar permisos por rol entre técnico, coordinador y administrador
+
+## Módulos entregados (100%, 22/07/2026)
+- Autenticación y usuarios (JWT, bloqueo por intentos fallidos, roles)
+- Catálogo de Materiales
+- Inventory Movements (entradas, salidas, ajustes — inmutables)
+- Trazabilidad y auditoría (filtros combinables por material, tipo, responsable y fecha)
+- Consulta y Dashboard (indicadores y stock bajo)
+
+Notificaciones queda fuera del alcance de esta entrega (decisión explícita del 21/07/2026). Detalle completo de checkpoints, decisiones y verificaciones en `CLAUDE.md`.
 
 ## Estructura del proyecto
 - `apps/frontend`: aplicación web construida con Next.js
@@ -81,7 +90,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 - Health check del backend: `http://localhost:3001/health`
 
 ## Estado del proyecto
-El proyecto se encuentra en fase inicial de construcción del MVP, con la base del entorno local configurada y la estructura de frontend y backend preparada para continuar con la implementación de autenticación, materiales y movimientos de inventario.
+Los 5 módulos del alcance del MVP (Autenticación, Materiales, Inventory Movements, Trazabilidad/auditoría y Consulta/Dashboard) están completos y verificados con Postman y en navegador. El trabajo está en la rama `feature/checkpoints-007-010` (pusheada a `origin`), pendiente de Pull Request hacia `main` siguiendo Gitflow. Ver `CLAUDE.md` para el detalle de cada checkpoint, y `PRD.md`, `HISTORIAS-DE-USUARIO.md`, `ERD.md` y `specs/` para la documentación funcional y técnica.
 
 ## Licencia
 Este proyecto se distribuye con fines de desarrollo y validación funcional en el contexto del MVP definido para ManteStock.

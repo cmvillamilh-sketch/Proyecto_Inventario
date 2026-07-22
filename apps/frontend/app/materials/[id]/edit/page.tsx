@@ -1,5 +1,7 @@
+import { redirect } from 'next/navigation';
 import MaterialForm from '../../../../components/materials/MaterialForm';
 import { getMaterialById } from '../../../../services/materials.service';
+import { getServerAuth } from '../../../../lib/auth/server';
 
 interface EditMaterialPageProps {
   params: {
@@ -8,7 +10,13 @@ interface EditMaterialPageProps {
 }
 
 export default async function EditMaterialPage({ params }: EditMaterialPageProps) {
-  const material = await getMaterialById(params.id);
+  const auth = getServerAuth();
+
+  if (!auth) {
+    redirect('/login');
+  }
+
+  const material = await getMaterialById(params.id, auth.token);
 
   return (
     <main>

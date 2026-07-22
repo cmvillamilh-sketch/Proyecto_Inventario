@@ -1,0 +1,7 @@
+# Use this workspace to collaborate
+workspace:
+  id: 192868e8-3ad9-4b01-a13c-7ce2a9d8b239
+
+localResources:
+  collections:
+    - ../ManteStock-007.3-Users.postman_collection.json

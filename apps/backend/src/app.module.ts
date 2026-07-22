@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
 import { MaterialsModule } from './materials/materials.module';
 import { InventoryMovementsModule } from './inventory-movements/inventory-movements.module';
+import { UsersModule } from './users/users.module';
 
 const envFilePath = [
   path.resolve(process.cwd(), '.env'),
@@ -29,6 +30,7 @@ const envFilePath = [
     AuthModule,
     MaterialsModule,
     InventoryMovementsModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [],

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ManteStock — Estado del proyecto</title>
+<style>
+  :root {
+    --green: #1a7f37;
+    --green-bg: #e6f4ea;
+    --amber: #9a6700;
+    --amber-bg: #fff8e5;
+    --gray: #57606a;
+    --gray-bg: #f0f1f2;
+    --border: #d0d7de;
+    --text: #1f2328;
+    --muted: #57606a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text);
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    line-height: 1.55;
+    background: #fff;
+  }
+  h1 { font-size: 1.8rem; margin-bottom: 4px; }
+  h2 { font-size: 1.3rem; margin-top: 44px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+  h3 { font-size: 1.05rem; margin-top: 28px; }
+  .subtitle { color: var(--muted); margin-top: 0; font-size: 0.95rem; }
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+  .badge-done { background: var(--green-bg); color: var(--green); }
+  .badge-dropped { background: var(--gray-bg); color: var(--gray); }
+  .badge-note { background: var(--amber-bg); color: var(--amber); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 0.92rem;
+  }
+  th, td {
+    text-align: left;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    vertical-align: top;
+  }
+  th { background: #f6f8fa; font-weight: 600; }
+  code {
+    background: #f6f8fa;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 0.88em;
+    border: 1px solid var(--border);
+  }
+  .summary-box {
+    background: var(--green-bg);
+    border: 1px solid #b7dfc3;
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin-top: 20px;
+  }
+  .summary-box p { margin: 6px 0; }
+  .note-box {
+    background: var(--amber-bg);
+    border: 1px solid #f0dca0;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 14px 0;
+    font-size: 0.92rem;
+  }
+  ul, ol { padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  .meta {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .footer {
+    margin-top: 60px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<h1>ManteStock — Estado del proyecto</h1>
+<p class="subtitle">Sistema de inventario de mantenimiento industrial · Resumen al 21 de julio de 2026, para la entrega del jueves</p>
+
+<div class="summary-box">
+  <p><strong>5 de 5 módulos del alcance definido para esta entrega están al 100%</strong>, verificados con evidencia real (colecciones de Postman con tests automáticos + pruebas manuales en navegador), no solo por compilación.</p>
+  <p>El módulo de <strong>Notificaciones</strong> se descartó del alcance por decisión explícita — no es un pendiente, es una exclusión consciente.</p>
+  <p><strong>13 commits locales, todavía no subidos a <code>origin</code></strong> (repo: <code>cmvillamilh-sketch/Proyecto_Inventario</code>). Falta decidir si se hace push antes de la entrega.</p>
+</div>
+
+<h2>Estado por módulo</h2>
+<table>
+  <thead>
+    <tr><th>Módulo</th><th>Estado</th><th>Evidencia de validación</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Catálogo de materiales</td>
+      <td><span class="badge badge-done">100%</span></td>
+      <td>CRUD completo, unicidad de <code>code</code>, búsqueda por código/descripción. Verificado en navegador y Postman.</td>
+    </tr>
+    <tr>
+      <td>Inventario y movimientos</td>
+      <td><span class="badge badge-done">100%</span></td>
+      <td>Entradas/salidas/ajustes con transacción atómica, validación de stock, inmutabilidad (sin editar/eliminar). Verificado en navegador y Postman.</td>
+    </tr>
+    <tr>
+      <td>Autenticación y usuarios</td>
+      <td><span class="badge badge-done">100%</span></td>
+      <td>Login con bloqueo por intentos, JWT, roles, CRUD de usuarios admin-only, frontend con rutas protegidas. 13/13 tests Postman + validación manual en navegador.</td>
+    </tr>
+    <tr>
+      <td>Trazabilidad y auditoría</td>
+      <td><span class="badge badge-done">100%</span></td>
+      <td>Historial por material y por usuario, filtros por fecha/tipo/responsable, registros inmutables. 10/10 tests Postman + validación manual.</td>
+    </tr>
+    <tr>
+      <td>Consulta y dashboard</td>
+      <td><span class="badge badge-done">100%</span></td>
+      <td>Indicadores (total materiales, unidades en stock, stock bajo), búsqueda de materiales. 4/4 tests Postman + validación manual.</td>
+    </tr>
+    <tr>
+      <td>Notificaciones</td>
+      <td><span class="badge badge-dropped">Descartado</span></td>
+      <td>Decisión explícita del usuario (21/07/2026) — fuera del alcance de esta entrega.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Qué se puede demostrar el jueves</h2>
+<ol>
+  <li>Login con bloqueo tras 2 intentos fallidos (5 min), y con distintos roles.</li>
+  <li>Dashboard de inicio con indicadores generales y materiales en stock bajo.</li>
+  <li>Alta de material, búsqueda por código o descripción.</li>
+  <li>Registro de entrada/salida/ajuste de inventario, con validación de stock insuficiente.</li>
+  <li>Historial de movimientos filtrable por material, responsable, tipo y rango de fechas.</li>
+  <li>Panel de usuarios (solo lectura) visible únicamente para el rol ADMIN.</li>
+</ol>
+
+<h2>Usuarios de prueba para la demo</h2>
+<table>
+  <thead><tr><th>Usuario</th><th>Contraseña</th><th>Rol</th></tr></thead>
+  <tbody>
+    <tr><td><code>admin</code></td><td><code>Admin123!</code></td><td>ADMIN</td></tr>
+    <tr><td><code>tecnico1</code></td><td><code>Tecnico123!</code></td><td>TECNICO</td></tr>
+  </tbody>
+</table>
+
+<h2>Cómo levantar el proyecto</h2>
+<table>
+  <thead><tr><th>Componente</th><th>Comando</th><th>Puerto</th></tr></thead>
+  <tbody>
+    <tr><td>PostgreSQL</td><td><code>docker compose up -d</code></td><td>5432</td></tr>
+    <tr><td>Backend (NestJS)</td><td><code>npm run start:dev</code> (en <code>apps/backend</code>)</td><td>3001</td></tr>
+    <tr><td>Frontend (Next.js)</td><td><code>npm run dev</code> (en <code>apps/frontend</code>)</td><td>3000</td></tr>
+  </tbody>
+</table>
+
+<h2>Bugs reales encontrados y corregidos durante esta sesión</h2>
+<table>
+  <thead><tr><th>Bug</th><th>Causa</th><th>Corrección</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>Header no reflejaba la sesión tras login/logout</td>
+      <td>Faltaba <code>router.refresh()</code> antes de <code>router.push()</code> — Next.js servía el layout desde el router cache del cliente.</td>
+      <td>Agregado en <code>LoginForm.tsx</code> y <code>LogoutButton.tsx</code>.</td>
+    </tr>
+    <tr>
+      <td>Crear o editar un material fallaba con error genérico</td>
+      <td><code>MaterialForm.tsx</code> enviaba <code>currentStock</code>, un campo que no existe en el DTO del backend (<code>forbidNonWhitelisted: true</code> lo rechazaba con 400 para cualquier usuario).</td>
+      <td>Se quitó el campo <code>currentStock</code> del formulario (además, no debía existir: el stock solo cambia vía movimientos de inventario). Se agregó manejo de errores real en vez del mensaje genérico.</td>
+    </tr>
+    <tr>
+      <td>007.3 se creía "en curso" pero no existía en el código</td>
+      <td>Un archivo de traspaso desactualizado (<code>handoff-mantestock-nuevo-chat.md</code>) afirmaba avance que nunca se confirmó contra el código real.</td>
+      <td>Verificado contra <code>git log</code> y el código fuente; se retomó desde cero con evidencia real.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Decisiones de arquitectura clave (registradas con fecha)</h2>
+<ul>
+  <li><strong>Roles:</strong> TECNICO, COORDINADOR, ADMIN. Solo el CRUD de usuarios (<code>/users</code>) está protegido por rol; Materiales e Inventory Movements siguen abiertos a cualquier usuario autenticado (decisión consciente, no un olvido).</li>
+  <li><strong>Trazabilidad (<code>createdBy</code>):</strong> se guarda como texto plano (username), no como relación a <code>User</code> — evita joins y el riesgo de exponer el hash de contraseña.</li>
+  <li><strong>Sesión del frontend:</strong> cookie simple (no httpOnly) en vez de <code>localStorage</code>, necesario para que el middleware de rutas protegidas y los Server Components puedan leerla. Trade-off de seguridad aceptado y documentado para el alcance de MVP.</li>
+  <li><strong>Inmutabilidad de movimientos:</strong> confirmado por especificación (RNF08) — no se pueden editar ni eliminar, por diseño, no por limitación técnica.</li>
+  <li><strong>Stock como entero:</strong> se difiere el soporte de decimales (kg, litros fraccionados) — el catálogo asume unidades enteras por ahora.</li>
+</ul>
+
+<h2>Pendientes menores, no bloqueantes para el jueves</h2>
+<div class="note-box">
+  <ul>
+    <li><strong>13 commits sin subir a <code>origin</code></strong> — decidir si se hace push antes de la entrega.</li>
+    <li><code>JWT_SECRET=change-me</code> en <code>.env</code> local — reemplazar por un secreto real antes de cualquier despliegue fuera de desarrollo.</li>
+    <li><code>POST /auth/login</code> devuelve <code>201</code> (default de Nest), no el <code>200</code> más convencional para un login — funcional, es cuestión de estilo si se cambia.</li>
+    <li>Un admin puede cambiar su propio rol a TECNICO/COORDINADOR sin restricción (sí está bloqueada la autodesactivación, pero no el cambio de rol).</li>
+  </ul>
+</div>
+
+<div class="footer">
+  Generado a partir de <code>CLAUDE.md</code> y las colecciones de Postman verificadas durante la sesión del 21/07/2026. Cada checkpoint fue validado con evidencia real (Postman con tests automáticos y/o pruebas manuales en navegador) antes de marcarse como completo.
+</div>
+
+</body>
+</html>

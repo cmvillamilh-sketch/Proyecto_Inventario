@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ManteStock — Guía funcional para Técnico</title>
+<style>
+  :root {
+    --blue: #2563eb;
+    --blue-bg: #eff6ff;
+    --green: #1a7f37;
+    --green-bg: #e6f4ea;
+    --red: #b91c1c;
+    --red-bg: #fef2f2;
+    --amber: #9a6700;
+    --amber-bg: #fff8e5;
+    --gray: #57606a;
+    --border: #d0d7de;
+    --text: #1f2328;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text);
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    line-height: 1.6;
+  }
+  h1 { font-size: 1.9rem; margin-bottom: 2px; }
+  .subtitle { color: var(--gray); margin-top: 0; }
+  h2 {
+    font-size: 1.25rem;
+    margin-top: 42px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--blue);
+    color: #111827;
+  }
+  h3 { font-size: 1.02rem; margin-top: 22px; color: #111827; }
+  .step {
+    display: flex;
+    gap: 14px;
+    margin: 14px 0;
+    align-items: flex-start;
+  }
+  .step-num {
+    flex: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--blue);
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .step-text { padding-top: 2px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 0.92rem;
+  }
+  th, td {
+    text-align: left;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    vertical-align: top;
+  }
+  th { background: #f6f8fa; font-weight: 600; }
+  code {
+    background: #f6f8fa;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    border: 1px solid var(--border);
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+  .badge-green { background: var(--green-bg); color: var(--green); }
+  .badge-red { background: var(--red-bg); color: var(--red); }
+  .badge-amber { background: var(--amber-bg); color: var(--amber); }
+  .note-box {
+    background: var(--blue-bg);
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 0.92rem;
+  }
+  .warn-box {
+    background: var(--amber-bg);
+    border: 1px solid #f0dca0;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 0.92rem;
+  }
+  .deny-box {
+    background: var(--red-bg);
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 0.92rem;
+  }
+  ul, ol { padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  .footer {
+    margin-top: 60px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 0.82rem;
+    color: var(--gray);
+  }
+</style>
+</head>
+<body>
+
+<h1>ManteStock — Guía funcional para el rol Técnico</h1>
+<p class="subtitle">Cómo usar el sistema para consultar inventario y registrar entradas, salidas y ajustes de material</p>
+
+<h2>1. Iniciar sesión</h2>
+<div class="step"><div class="step-num">1</div><div class="step-text">Abre la aplicación en el navegador. Si no tienes sesión activa, te llevará directo a la pantalla <strong>Iniciar sesión</strong>.</div></div>
+<div class="step"><div class="step-num">2</div><div class="step-text">Ingresa tu <strong>Usuario</strong> y <strong>Contraseña</strong>, y presiona <strong>Ingresar</strong>.</div></div>
+<div class="step"><div class="step-num">3</div><div class="step-text">Si te equivocas dos veces seguidas, tu cuenta se bloquea automáticamente por <strong>5 minutos</strong> como medida de seguridad. Espera ese tiempo y vuelve a intentar.</div></div>
+<div class="step"><div class="step-num">4</div><div class="step-text">Al ingresar correctamente, llegas al <strong>Dashboard</strong> (pantalla de inicio).</div></div>
+
+<h2>2. Dashboard (pantalla de inicio)</h2>
+<p>Muestra un resumen general del inventario:</p>
+<table>
+  <thead><tr><th>Indicador</th><th>Qué significa</th></tr></thead>
+  <tbody>
+    <tr><td>Total de materiales</td><td>Cantidad de materiales distintos registrados en el catálogo.</td></tr>
+    <tr><td>Unidades totales en stock</td><td>Suma del stock actual de todos los materiales juntos.</td></tr>
+    <tr><td>Materiales con stock bajo</td><td>Cantidad de materiales cuyo stock actual ya llegó a su mínimo o está por debajo.</td></tr>
+  </tbody>
+</table>
+<p>Debajo de las tarjetas hay una tabla con el detalle de esos materiales en stock bajo (resaltados en color ámbar), para que sepas cuáles reponer primero.</p>
+
+<h2>3. Consultar y gestionar materiales</h2>
+<h3>Buscar un material</h3>
+<div class="step"><div class="step-num">1</div><div class="step-text">Entra a <strong>Materiales</strong> en el menú superior.</div></div>
+<div class="step"><div class="step-num">2</div><div class="step-text">Usa el campo de búsqueda: escribe parte del código o de la descripción y presiona <strong>Buscar</strong>. No distingue mayúsculas/minúsculas.</div></div>
+<div class="step"><div class="step-num">3</div><div class="step-text">Para volver a ver todos los materiales, presiona <strong>Limpiar</strong>.</div></div>
+
+<h3>Registrar un material nuevo</h3>
+<div class="step"><div class="step-num">1</div><div class="step-text">En <strong>Materiales</strong>, presiona <strong>Nuevo material</strong>.</div></div>
+<div class="step"><div class="step-num">2</div><div class="step-text">Completa los campos:</div></div>
+<table>
+  <thead><tr><th>Campo</th><th>Detalle</th></tr></thead>
+  <tbody>
+    <tr><td>Código</td><td>Debe ser único — el sistema rechaza códigos repetidos.</td></tr>
+    <tr><td>Descripción</td><td>Nombre o detalle del material.</td></tr>
+    <tr><td>Categoría</td><td>Texto libre (ej. Mecánico, Eléctrico).</td></tr>
+    <tr><td>Unidad</td><td>Unidad de medida (ej. unidad, caja).</td></tr>
+    <tr><td>Stock mínimo</td><td>A partir de qué cantidad se considera "stock bajo".</td></tr>
+  </tbody>
+</table>
+<div class="note-box">
+  El <strong>stock actual</strong> no se ingresa aquí — todo material nuevo arranca en 0. El stock solo cambia registrando movimientos de inventario (ver sección 4). Esto es intencional: así queda registro de cada cambio de stock, no se puede "editar" el número directamente.
+</div>
+<div class="step"><div class="step-num">3</div><div class="step-text">Presiona <strong>Guardar</strong>.</div></div>
+
+<h3>Editar o eliminar un material</h3>
+<p>Desde la tabla de <strong>Materiales</strong>, cada fila tiene los botones <strong>Editar</strong> y <strong>Eliminar</strong>. Igual que en el alta, el stock actual no se puede modificar desde el formulario de edición.</p>
+
+<h2>4. Registrar movimientos de inventario</h2>
+<div class="step"><div class="step-num">1</div><div class="step-text">Entra a <strong>Inventario</strong> en el menú superior.</div></div>
+<div class="step"><div class="step-num">2</div><div class="step-text">Presiona <strong>Nuevo movimiento</strong>.</div></div>
+<div class="step"><div class="step-num">3</div><div class="step-text">Completa el formulario:</div></div>
+<table>
+  <thead><tr><th>Campo</th><th>Detalle</th></tr></thead>
+  <tbody>
+    <tr><td>Material</td><td>Selecciónalo del listado — se muestra junto con su stock actual.</td></tr>
+    <tr>
+      <td>Tipo</td>
+      <td>
+        <span class="badge badge-green">Entrada</span> suma al stock (ej. compra, reposición).<br>
+        <span class="badge badge-red">Salida</span> resta del stock (ej. uso en una orden de trabajo).<br>
+        <span class="badge badge-amber">Ajuste</span> fija el stock exactamente al número que ingreses (no suma ni resta, lo reemplaza).
+      </td>
+    </tr>
+    <tr><td>Cantidad</td><td>Número entero, mínimo 1.</td></tr>
+    <tr><td>Motivo</td><td>Obligatorio — describe por qué se hizo el movimiento.</td></tr>
+  </tbody>
+</table>
+<div class="warn-box">
+  <strong>Una salida no puede superar el stock disponible.</strong> Si lo intentas, el sistema la rechaza y te muestra el error sin perder lo que ya escribiste en el formulario.
+</div>
+<div class="deny-box">
+  <strong>Los movimientos no se pueden editar ni eliminar después de guardarlos, por nadie</strong> — ni siquiera un administrador. Es una regla fija del sistema para que el historial sea confiable. Revisa bien los datos antes de presionar <strong>Guardar</strong>.
+</div>
+
+<h2>5. Consultar el historial y filtrar</h2>
+<p>La tabla de <strong>Inventario</strong> lista todos los movimientos con: fecha, material, tipo (con color), cantidad, motivo, responsable (quién lo registró) y el stock resultante.</p>
+<p>Arriba de la tabla hay un formulario para filtrar por:</p>
+<ul>
+  <li><strong>Material</strong> — ver el historial de un material puntual.</li>
+  <li><strong>Tipo</strong> — solo entradas, salidas o ajustes.</li>
+  <li><strong>Responsable</strong> — movimientos hechos por un usuario específico (coincidencia exacta del nombre de usuario).</li>
+  <li><strong>Desde / Hasta</strong> — rango de fechas, incluye el día completo seleccionado.</li>
+</ul>
+<p>Los filtros se pueden combinar. Presiona <strong>Filtrar</strong> para aplicarlos y <strong>Limpiar filtros</strong> para ver todo de nuevo.</p>
+
+<h2>6. Qué no puede hacer un Técnico</h2>
+<div class="deny-box">
+  La sección <strong>Usuarios</strong> es exclusiva del rol Administrador — un Técnico no la ve en el menú, y si intenta entrar directo por la URL, el sistema lo redirige de vuelta.
+</div>
+
+<h2>7. Cerrar sesión</h2>
+<p>Presiona <strong>Cerrar sesión</strong> arriba a la derecha en cualquier pantalla. Se cierra tu sesión de inmediato y vuelves al login.</p>
+
+<div class="footer">
+  Guía basada en el comportamiento real verificado del sistema (no en la especificación original) — cualquier cambio futuro en la aplicación puede requerir actualizar este documento.
+</div>
+
+</body>
+</html>

@@ -19,8 +19,8 @@ export default async function UsersPage() {
   const users = await getUsers(auth.token);
 
   return (
-    <main>
-      <h1>Usuarios</h1>
+    <main className="max-w-5xl mx-auto px-6 py-8">
+      <h1 className="text-2xl font-semibold text-gray-900 mb-6">Usuarios</h1>
       <UsersTable users={users} />
     </main>
   );

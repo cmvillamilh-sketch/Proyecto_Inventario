@@ -19,6 +19,7 @@ export default function InventoryMovementTable({ movements }: InventoryMovementT
           <th>Tipo</th>
           <th>Cantidad</th>
           <th>Motivo</th>
+          <th>Responsable</th>
           <th>Stock actual</th>
         </tr>
       </thead>

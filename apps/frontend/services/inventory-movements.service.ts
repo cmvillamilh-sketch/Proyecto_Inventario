@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '../lib/api';
-import { InventoryMovement } from '../types/inventory-movement';
+import { InventoryMovement, InventoryMovementFilters } from '../types/inventory-movement';
 import { CreateInventoryMovementDto } from '../types/inventory-movement.dto';
 
 async function extractErrorMessage(response: Response): Promise<string> {
@@ -13,8 +13,21 @@ async function extractErrorMessage(response: Response): Promise<string> {
   return message || 'Ocurrió un error inesperado.';
 }
 
-async function getAll(token: string): Promise<InventoryMovement[]> {
-  const response = await fetch(`${API_BASE_URL}/inventory-movements`, {
+async function getAll(token: string, filters?: InventoryMovementFilters): Promise<InventoryMovement[]> {
+  const params = new URLSearchParams();
+
+  if (filters) {
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value) {
+        params.set(key, value);
+      }
+    });
+  }
+
+  const queryString = params.toString();
+  const url = queryString ? `${API_BASE_URL}/inventory-movements?${queryString}` : `${API_BASE_URL}/inventory-movements`;
+
+  const response = await fetch(url, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

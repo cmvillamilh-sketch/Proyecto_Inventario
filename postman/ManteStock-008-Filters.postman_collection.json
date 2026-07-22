@@ -1,0 +1,203 @@
+{
+  "info": {
+    "name": "ManteStock 008 - Filtros de InventoryMovements",
+    "description": "Corre los requests EN ORDEN (1 a 10). Revisa la pestana 'Test Results' de cada uno.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3001" },
+    { "key": "adminToken", "value": "" },
+    { "key": "tecnicoToken", "value": "" },
+    { "key": "testMaterialCode", "value": "" },
+    { "key": "testMaterialId", "value": "" },
+    { "key": "today", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Login admin",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\"username\":\"admin\",\"password\":\"Admin123!\"}" },
+        "url": "{{baseUrl}}/auth/login"
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('201 Created', () => pm.response.to.have.status(201));",
+          "pm.collectionVariables.set('adminToken', pm.response.json().accessToken);",
+          "pm.collectionVariables.set('today', new Date().toISOString().split('T')[0]);"
+        ]}
+      }]
+    },
+    {
+      "name": "2. Login tecnico1",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\"username\":\"tecnico1\",\"password\":\"Tecnico123!\"}" },
+        "url": "{{baseUrl}}/auth/login"
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('201 Created', () => pm.response.to.have.status(201));",
+          "pm.collectionVariables.set('tecnicoToken', pm.response.json().accessToken);"
+        ]}
+      }]
+    },
+    {
+      "name": "3. POST /materials - crear material de prueba (admin)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\"code\":\"{{testMaterialCode}}\",\"description\":\"Material de prueba 008\",\"category\":\"PRUEBA\",\"unitOfMeasure\":\"unidad\",\"minimumStock\":1}" },
+        "url": "{{baseUrl}}/materials"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": { "exec": [
+            "pm.collectionVariables.set('testMaterialCode', 'TEST-008-' + Date.now());"
+          ]}
+        },
+        {
+          "listen": "test",
+          "script": { "exec": [
+            "pm.test('201 Created', () => pm.response.to.have.status(201));",
+            "pm.collectionVariables.set('testMaterialId', pm.response.json().id);"
+          ]}
+        }
+      ]
+    },
+    {
+      "name": "4. POST /inventory-movements - ENTRY como admin (10 unidades)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\"materialId\":\"{{testMaterialId}}\",\"type\":\"ENTRY\",\"quantity\":10,\"reason\":\"Prueba 008 - entrada admin\"}" },
+        "url": "{{baseUrl}}/inventory-movements"
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('201 Created', () => pm.response.to.have.status(201));",
+          "pm.test(\"createdBy es 'admin'\", () => pm.expect(pm.response.json().createdBy).to.equal('admin'));"
+        ]}
+      }]
+    },
+    {
+      "name": "5. POST /inventory-movements - EXIT como tecnico1 (3 unidades)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{tecnicoToken}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\"materialId\":\"{{testMaterialId}}\",\"type\":\"EXIT\",\"quantity\":3,\"reason\":\"Prueba 008 - salida tecnico1\"}" },
+        "url": "{{baseUrl}}/inventory-movements"
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('201 Created', () => pm.response.to.have.status(201));",
+          "pm.test(\"createdBy es 'tecnico1'\", () => pm.expect(pm.response.json().createdBy).to.equal('tecnico1'));"
+        ]}
+      }]
+    },
+    {
+      "name": "6. GET /inventory-movements?materialId=... -> solo los 2 del material de prueba",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+        "url": "{{baseUrl}}/inventory-movements?materialId={{testMaterialId}}"
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('200 OK', () => pm.response.to.have.status(200));",
+          "const json = pm.response.json();",
+          "pm.test('devuelve exactamente 2 movimientos', () => pm.expect(json.length).to.equal(2));",
+          "pm.test('todos son del material de prueba', () => json.forEach(m => pm.expect(m.material.id).to.equal(pm.collectionVariables.get('testMaterialId'))));"
+        ]}
+      }]
+    },
+    {
+      "name": "7. GET /inventory-movements?createdBy=admin -> todos con createdBy admin",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+        "url": "{{baseUrl}}/inventory-movements?createdBy=admin"
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('200 OK', () => pm.response.to.have.status(200));",
+          "const json = pm.response.json();",
+          "pm.test('todos tienen createdBy admin', () => json.forEach(m => pm.expect(m.createdBy).to.equal('admin')));",
+          "pm.test('incluye al menos 1 resultado', () => pm.expect(json.length).to.be.greaterThan(0));"
+        ]}
+      }]
+    },
+    {
+      "name": "8. GET /inventory-movements?type=EXIT -> todos son EXIT",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+        "url": "{{baseUrl}}/inventory-movements?type=EXIT"
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('200 OK', () => pm.response.to.have.status(200));",
+          "const json = pm.response.json();",
+          "pm.test('todos son EXIT', () => json.forEach(m => pm.expect(m.type).to.equal('EXIT')));",
+          "pm.test('incluye al menos 1 resultado', () => pm.expect(json.length).to.be.greaterThan(0));"
+        ]}
+      }]
+    },
+    {
+      "name": "9. GET /inventory-movements?dateFrom=hoy&dateTo=hoy -> incluye los de esta corrida",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+        "url": "{{baseUrl}}/inventory-movements?dateFrom={{today}}&dateTo={{today}}"
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('200 OK', () => pm.response.to.have.status(200));",
+          "const json = pm.response.json();",
+          "const ids = json.map(m => m.material.id);",
+          "pm.test('incluye el material de prueba creado hoy', () => pm.expect(ids).to.include(pm.collectionVariables.get('testMaterialId')));"
+        ]}
+      }]
+    },
+    {
+      "name": "10. GET combinando materialId + createdBy=tecnico1 -> exactamente 1 (el EXIT)",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+        "url": "{{baseUrl}}/inventory-movements?materialId={{testMaterialId}}&createdBy=tecnico1"
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('200 OK', () => pm.response.to.have.status(200));",
+          "const json = pm.response.json();",
+          "pm.test('exactamente 1 resultado', () => pm.expect(json.length).to.equal(1));",
+          "pm.test('es el EXIT de tecnico1', () => {",
+          "  pm.expect(json[0].type).to.equal('EXIT');",
+          "  pm.expect(json[0].createdBy).to.equal('tecnico1');",
+          "});"
+        ]}
+      }]
+    }
+  ]
+}

@@ -100,20 +100,34 @@ Fuente literal: `05-modulos-del-sistema.md` y `gemini-code-1784071345471.md` (se
 
 | Función especificada | Estado | % |
 |---|---|---|
-| Historial de movimientos por material | Parcial — el dato existe (`findAll()` con relación a `material`), pero no hay filtro/endpoint dedicado (`?materialId=` o `/materials/:id/movements`) | 12.5% |
-| Historial de movimientos por usuario | No iniciado — no existe campo `createdBy`/`userId` en la entidad; depende del módulo de autenticación | 0% |
-| Filtros por fecha, tipo y responsable | No iniciado — `findAll()` no acepta query params ni lógica `where` condicional | 0% |
+| Historial de movimientos por material | ✅ Completo (checkpoint 008) — `GET /inventory-movements?materialId=` | 25% |
+| Historial de movimientos por usuario | ✅ Completo (checkpoint 008) — `GET /inventory-movements?createdBy=` | 25% |
+| Filtros por fecha, tipo y responsable | ✅ Completo (checkpoint 008) — `?type=`, `?dateFrom=`, `?dateTo=`, combinables entre sí | 25% |
 | Registros inmutables | Completo — verificado en dos capas: el controller no expone PUT/DELETE, y el service los rechaza con `ForbiddenException` si se invocan directamente | 25% |
 
-**Total del módulo: 37.5% (≈38%)**, no una estimación a ojo — recalcular si cambia alguno de estos puntos.
+**Total del módulo: 100% ✅ (cerrado el 21/07/2026, checkpoint 008)**.
+
+## Checkpoint 008 — verificado (21/07/2026)
+
+Backend validado con colección de Postman (`postman/ManteStock-008-Filters.postman_collection.json`, 10 requests) — todos en verde: filtro por `materialId` (exactamente los movimientos de ese material), por `createdBy` (coincidencia exacta), por `type`, por rango de fecha (`dateFrom`/`dateTo` incluyendo el día completo), y combinación de filtros. Frontend validado en navegador: columna "Responsable" visible en la tabla, formulario de filtros (`<form method="GET">`) cambia la URL con los query params correctos, "Limpiar filtros" vuelve a la lista completa. Pendiente de commitear.
 
 ---
 
+## Checkpoint 008 — Trazabilidad y auditoría (arquitectura, 21/07/2026)
+
+Completa las 3 funciones pendientes del módulo (ver desglose de 19/07/2026 más abajo): historial por material, historial por usuario, filtros por fecha/tipo/responsable. Las tres se resuelven con un solo mecanismo: `GET /inventory-movements` acepta query params opcionales (`materialId`, `type`, `createdBy`, `dateFrom`, `dateTo`). No se crea un endpoint aparte tipo `/materials/:id/movements` — un único endpoint filtrable cubre las tres funciones de la especificación.
+
+Decisiones:
+1. **`createdBy` como filtro**: coincidencia exacta (no búsqueda parcial), igual que el resto de la app no tiene búsquedas difusas en ningún lado todavía.
+2. **`dateFrom`/`dateTo`**: se interpretan como fecha (no fecha+hora). `dateFrom` se ajusta a las 00:00:00 del día y `dateTo` a las 23:59:59.999, para que un filtro "de tal día a tal día" incluya el día completo (los `<input type="date">` del navegador solo mandan `YYYY-MM-DD`).
+3. **Frontend**: formulario `<form method="GET">` nativo sobre `/inventory-movements`, sin JavaScript ni Client Component — al enviar, cambia la URL con los query params y el Server Component se re-renderiza filtrado. Consistente con el patrón `force-dynamic` que ya usa esta página.
+4. **Alcance por rol**: sin cambios — el endpoint sigue abierto a cualquier usuario autenticado (no se agregó `@Roles()` aquí, misma decisión que en 007.3 para Materials/InventoryMovements).
+
 ## Próximo objetivo
 
-Checkpoint 007 completo (007.1 a 007.5) — el módulo de Autenticación y usuarios queda cerrado, backend y frontend, commits pendientes de confirmar.
+Checkpoints 007 (Autenticación) y 008 (Trazabilidad y auditoría) completos y verificados — commits pendientes de confirmar.
 
-Según `05-modulos-del-sistema.md` y `gemini-code-1784071345471.md`, del alcance total del MVP (6 módulos) quedan pendientes: Trazabilidad/auditoría (~38%, faltan historial por usuario y filtros por fecha/tipo/responsable), Consulta/dashboard (0%), y Notificaciones (0%). Materiales, Inventory Movements y Autenticación están al 100%. Pendiente de decidir con el usuario qué priorizar antes de la entrega del jueves.
+Según `05-modulos-del-sistema.md` y `gemini-code-1784071345471.md`, del alcance total del MVP (6 módulos) quedan pendientes: Consulta/dashboard (0%) y Notificaciones (0%). Materiales, Inventory Movements, Autenticación y Trazabilidad/auditoría están al 100%. Pendiente de decidir con el usuario qué priorizar antes de la entrega del jueves.
 
 ---
 

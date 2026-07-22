@@ -1,9 +1,10 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { Between, DataSource, FindOptionsWhere, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { Material } from '../materials/entities/material.entity';
 import { MovementType } from './enums/movement-type.enum';
 import { CreateInventoryMovementDto } from './dto/create-inventory-movement.dto';
+import { FindInventoryMovementsDto } from './dto/find-inventory-movements.dto';
 import { InventoryMovement } from './entities/inventory-movement.entity';
 
 @Injectable()
@@ -16,8 +17,34 @@ export class InventoryMovementsService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async findAll() {
+  async findAll(filters: FindInventoryMovementsDto) {
+    const where: FindOptionsWhere<InventoryMovement> = {};
+
+    if (filters.materialId) {
+      where.material = { id: filters.materialId };
+    }
+
+    if (filters.type) {
+      where.type = filters.type;
+    }
+
+    if (filters.createdBy) {
+      where.createdBy = filters.createdBy;
+    }
+
+    if (filters.dateFrom && filters.dateTo) {
+      where.createdAt = Between(
+        new Date(`${filters.dateFrom}T00:00:00.000`),
+        new Date(`${filters.dateTo}T23:59:59.999`),
+      );
+    } else if (filters.dateFrom) {
+      where.createdAt = MoreThanOrEqual(new Date(`${filters.dateFrom}T00:00:00.000`));
+    } else if (filters.dateTo) {
+      where.createdAt = LessThanOrEqual(new Date(`${filters.dateTo}T23:59:59.999`));
+    }
+
     return this.inventoryMovementRepository.find({
+      where,
       relations: { material: true },
     });
   }

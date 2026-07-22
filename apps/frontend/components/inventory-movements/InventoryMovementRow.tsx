@@ -18,6 +18,7 @@ export default function InventoryMovementRow({ movement }: InventoryMovementRowP
       <td>{movementTypeLabels[movement.type]}</td>
       <td>{movement.quantity}</td>
       <td>{movement.reason}</td>
+      <td>{movement.createdBy ?? '—'}</td>
       <td>{movement.material.currentStock}</td>
     </tr>
   );

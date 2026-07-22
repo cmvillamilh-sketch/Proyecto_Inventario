@@ -51,7 +51,7 @@ export class InventoryMovementsService {
     }
   }
 
-  async create(data: CreateInventoryMovementDto) {
+  async create(data: CreateInventoryMovementDto, createdBy: string) {
     return this.dataSource.transaction(async (manager) => {
       const materialRepository = manager.getRepository(Material);
       const inventoryMovementRepository = manager.getRepository(InventoryMovement);
@@ -69,6 +69,7 @@ export class InventoryMovementsService {
       const inventoryMovement = inventoryMovementRepository.create({
         ...data,
         material,
+        createdBy,
       });
 
       const savedInventoryMovement = await inventoryMovementRepository.save(inventoryMovement);

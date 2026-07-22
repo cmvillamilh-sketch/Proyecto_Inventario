@@ -24,10 +24,11 @@ export class MaterialsService {
     return material;
   }
 
-  async create(data: CreateMaterialDto) {
+  async create(data: CreateMaterialDto, createdBy: string) {
     const material = this.materialRepository.create({
       ...data,
       currentStock: 0,
+      createdBy,
     });
 
     try {

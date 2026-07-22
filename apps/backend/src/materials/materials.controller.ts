@@ -3,6 +3,7 @@ import { MaterialsService } from './materials.service';
 import { CreateMaterialDto } from './dto/create-material.dto';
 import { UpdateMaterialDto } from './dto/update-material.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CurrentUser, CurrentUserPayload } from '../auth/decorators/current-user.decorator';
 
 @Controller('materials')
 @UseGuards(JwtAuthGuard)
@@ -20,8 +21,8 @@ export class MaterialsController {
   }
 
   @Post()
-  create(@Body() body: CreateMaterialDto) {
-    return this.materialsService.create(body);
+  create(@Body() body: CreateMaterialDto, @CurrentUser() currentUser: CurrentUserPayload) {
+    return this.materialsService.create(body, currentUser.username);
   }
 
   @Put(':id')

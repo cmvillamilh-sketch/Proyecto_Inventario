@@ -22,6 +22,9 @@ export class InventoryMovement {
   @Column({ type: 'varchar', length: 255, nullable: true })
   reason: string;
 
+  @Column({ type: 'varchar', nullable: true })
+  createdBy: string | null;
+
   @CreateDateColumn()
   createdAt: Date;
 }

@@ -24,6 +24,9 @@ export class Material {
   @Column('int')
   currentStock: number;
 
+  @Column({ type: 'varchar', nullable: true })
+  createdBy: string | null;
+
   @OneToMany(() => InventoryMovement, (movement) => movement.material)
   movements: InventoryMovement[];
 }

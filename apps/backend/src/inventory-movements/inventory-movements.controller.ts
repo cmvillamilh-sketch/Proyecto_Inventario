@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, ParseUUIDPipe, Post, UseGuards } from '@n
 import { InventoryMovementsService } from './inventory-movements.service';
 import { CreateInventoryMovementDto } from './dto/create-inventory-movement.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CurrentUser, CurrentUserPayload } from '../auth/decorators/current-user.decorator';
 
 @Controller('inventory-movements')
 @UseGuards(JwtAuthGuard)
@@ -19,7 +20,7 @@ export class InventoryMovementsController {
   }
 
   @Post()
-  create(@Body() body: CreateInventoryMovementDto) {
-    return this.inventoryMovementsService.create(body);
+  create(@Body() body: CreateInventoryMovementDto, @CurrentUser() currentUser: CurrentUserPayload) {
+    return this.inventoryMovementsService.create(body, currentUser.username);
   }
 }

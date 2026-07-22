@@ -167,7 +167,7 @@ Estado previo: `AuthModule` era un stub — `POST /auth/login` aceptaba cualquie
 | 007.1 | Entidad `User`, hash de contraseña real (bcrypt), login real (reemplaza el stub), lockout de 2 intentos/5 min | ✅ Implementado y verificado con `curl` contra el servidor real (19/07/2026). Pendiente de verificación manual del usuario en Postman antes de commitear. |
 | 007.2 | `JwtAuthGuard` + estrategia JWT; proteger Materials e Inventory Movements | ✅ Implementado y verificado con `curl` (sin token → 401, token inválido → 401, token válido → 200, arranque falla sin `JWT_SECRET`). Pendiente de verificación manual del usuario en Postman antes de commitear. |
 | 007.3 | `RolesGuard`/`@Roles()`; CRUD de usuarios (admin-only); reseteo de contraseña por admin | ✅ Implementado y verificado el 21/07/2026 con colección de Postman (13 requests, incluye login admin/técnico, 403 por rol, 400 por password débil, 400 autobloqueo de admin, ciclo completo de reset-password, y soft-delete verificando que el registro no se borra físicamente). Todos los tests en verde. Pendiente de commitear. |
-| 007.4 | `createdBy` en `Material` e `InventoryMovement` (requiere el usuario autenticado del request) | Pendiente |
+| 007.4 | `createdBy` en `Material` e `InventoryMovement` (requiere el usuario autenticado del request) | ✅ Implementado y verificado el 21/07/2026 con colección de Postman (6 requests): material creado por `admin` trae `createdBy:"admin"`, movimiento creado por `tecnico1` trae `createdBy:"tecnico1"`, y los registros anteriores a este checkpoint siguen respondiendo con `createdBy:null` sin romper la lista. Todos los tests en verde. Pendiente de commitear. |
 | 007.5 | Frontend: página de login, rutas protegidas, UI condicionada por rol | Pendiente |
 
 **Nota sobre bootstrap de usuarios:** no existe endpoint HTTP de registro todavía (por diseño, se deja para 007.3 con guard admin-only). El primer usuario admin se crea con el script `npm run seed:test-user` (acepta username/password/role por argumento) — necesario porque un endpoint admin-only no puede usarse antes de que exista un admin. Este script queda como herramienta de desarrollo/bootstrap, no como parte de la API pública.
@@ -204,3 +204,7 @@ Fuentes: `01-objetivo-y-alcance.md` a `05-modulos-del-sistema.md`, `gemini-code-
 ## 007.3 — verificado (21/07/2026)
 
 Validado con colección de Postman (`postman/ManteStock-007.3-Users.postman_collection.json`, 13 requests con tests automáticos) — 13/13 en verde. Cubre: rechazo por rol (403), rechazo por password débil (400), rechazo de autobloqueo de admin (400), ciclo completo de reset-password (clave vieja deja de servir, clave nueva funciona), y soft-delete (el registro no se borra físicamente, `isActive:false`). Pendiente de commitear.
+
+## 007.4 — verificado (21/07/2026)
+
+Validado con colección de Postman (`postman/ManteStock-007.4-CreatedBy.postman_collection.json`, 6 requests) — todos en verde. Cubre: `POST /materials` como `admin` devuelve `createdBy:"admin"`, `POST /inventory-movements` como `tecnico1` devuelve `createdBy:"tecnico1"`, el valor persiste al releer el material por id, y la lista completa de materiales no se rompe con registros antiguos en `createdBy:null`. Pendiente de commitear.

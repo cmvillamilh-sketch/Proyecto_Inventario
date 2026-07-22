@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { deleteMaterial } from '../../services/materials.service';
+import { getClientToken } from '../../lib/auth/client';
 import { Material } from '../../types/material';
 
 interface MaterialRowProps {
@@ -25,7 +26,7 @@ export default function MaterialRow({ material }: MaterialRowProps) {
     setIsDeleting(true);
 
     try {
-      await deleteMaterial(material.id);
+      await deleteMaterial(material.id, getClientToken() ?? '');
       router.refresh();
     } catch (error) {
       setErrorMessage('No fue posible eliminar el material.');

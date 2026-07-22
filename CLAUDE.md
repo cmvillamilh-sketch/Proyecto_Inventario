@@ -35,7 +35,7 @@ ChatGPT y GitHub Copilot ya no forman parte del flujo de trabajo.
 
 ## Estado actual del proyecto
 
-**Checkpoint alcanzado: 006.6 ✅ (frontend validado en navegador el 19/07/2026)**
+**Checkpoint alcanzado: 007.5 ✅ (módulo de Autenticación y usuarios completo, backend + frontend, validado en navegador el 21/07/2026)**
 
 Pruebas realizadas y confirmadas:
 - `/inventory-movements` lista los movimientos con todas las columnas (fecha, material, tipo, cantidad, motivo, stock actual), sin acciones de editar/eliminar.
@@ -111,9 +111,9 @@ Fuente literal: `05-modulos-del-sistema.md` y `gemini-code-1784071345471.md` (se
 
 ## Próximo objetivo
 
-Checkpoints 006.5 y 006.6 completos — el módulo Inventory Movements queda cerrado (backend + frontend).
+Checkpoint 007 completo (007.1 a 007.5) — el módulo de Autenticación y usuarios queda cerrado, backend y frontend, commits pendientes de confirmar.
 
-Según `05-modulos-del-sistema.md` y `gemini-code-1784071345471.md`, el siguiente módulo en el alcance del MVP es **Autenticación y usuarios** (no iniciado): login, roles, bloqueo tras 2 intentos fallidos (5 min), y es prerrequisito para cubrir la trazabilidad por usuario (`created_by`) pendiente en Material e Inventory Movements. Pendiente de que ChatGPT (rol Claude) defina la arquitectura de este módulo antes de asignar un número de checkpoint.
+Según `05-modulos-del-sistema.md` y `gemini-code-1784071345471.md`, del alcance total del MVP (6 módulos) quedan pendientes: Trazabilidad/auditoría (~38%, faltan historial por usuario y filtros por fecha/tipo/responsable), Consulta/dashboard (0%), y Notificaciones (0%). Materiales, Inventory Movements y Autenticación están al 100%. Pendiente de decidir con el usuario qué priorizar antes de la entrega del jueves.
 
 ---
 
@@ -156,6 +156,13 @@ Estado previo: `AuthModule` era un stub — `POST /auth/login` aceptaba cualquie
 
 **`createdBy`**: se guarda como texto plano (el `username` capturado en el momento de crear el registro), no como relación FK a `User.id`. Evita joins y el riesgo de exponer `passwordHash` al popular la relación; suficiente para trazabilidad del MVP (RF05). La columna es `nullable: true` en ambas entidades porque `synchronize: true` no puede rellenar retroactivamente los materiales/movimientos ya existentes en la base — para esos registros antiguos, `createdBy` queda en `null` (creados antes de que existiera trazabilidad por usuario).
 
+### Decisiones tomadas (21/07/2026) — para 007.5
+
+1. **Hallazgo verificado antes de diseñar 007.5**: el frontend está roto en este momento. `materials.service.ts` e `inventory-movements.service.ts` nunca envían header `Authorization`, y desde 007.2 esos endpoints exigen JWT — cualquier carga de `/materials` o `/inventory-movements` da 401. 007.5 no es una mejora opcional, es lo que reconecta el frontend con el backend.
+2. **Almacenamiento del token**: cookie simple (no httpOnly), no `localStorage`. Es la única opción viable sin reescribir las páginas de listado (Server Components con `force-dynamic`) a Client Components — `localStorage` no es accesible en servidor, y el middleware de rutas protegidas de Next.js tampoco puede leerlo. Trade-off aceptado y documentado: una cookie legible por JS es tan vulnerable a XSS como `localStorage` (no es httpOnly), suficiente para el alcance del MVP. Revisar si el proyecto llega a producción real.
+3. **Alcance de "UI condicionada por rol"**: como ningún endpoint de Materials/InventoryMovements está protegido por rol todavía (ver nota de 007.3: `@Roles()` no se agregó ahí a propósito), lo único que el frontend puede condicionar honestamente por rol es el acceso a `/users`, que sí es admin-only en el backend. Se agrega una página de solo lectura (`/users`, sin crear/editar/resetear) visible solo para ADMIN en la navegación, más `username`/`role` visibles en el header. CRUD completo de usuarios desde el frontend queda fuera de este checkpoint.
+4. **Redirección post-login**: a `/materials`, no a `/` (la home actual es un placeholder estático).
+
 ### Corrección al registro (21/07/2026)
 
 `handoff-mantestock-nuevo-chat.md` (archivo suelto, no commiteado) afirmaba que el checkpoint 007.3 estaba "en curso, prompt ya dado a Claude Code, falta ver el resultado". Se verificó el código real (`apps/backend/src`, `git log`) el 21/07/2026 y **007.3 no existe**: no hay `UsersModule`, `UsersController`, `RolesGuard` ni `@Roles()`, y `app.module.ts` no importa ningún módulo de usuarios. El último commit sigue siendo `e02ab6f` (007.2), del 18/07/2026. Se trata este hallazgo como corrección del estado real, no como avance — 007.3 se retoma desde cero con el prompt de esta sesión.
@@ -166,9 +173,9 @@ Estado previo: `AuthModule` era un stub — `POST /auth/login` aceptaba cualquie
 |---|---|---|
 | 007.1 | Entidad `User`, hash de contraseña real (bcrypt), login real (reemplaza el stub), lockout de 2 intentos/5 min | ✅ Implementado y verificado con `curl` contra el servidor real (19/07/2026). Pendiente de verificación manual del usuario en Postman antes de commitear. |
 | 007.2 | `JwtAuthGuard` + estrategia JWT; proteger Materials e Inventory Movements | ✅ Implementado y verificado con `curl` (sin token → 401, token inválido → 401, token válido → 200, arranque falla sin `JWT_SECRET`). Pendiente de verificación manual del usuario en Postman antes de commitear. |
-| 007.3 | `RolesGuard`/`@Roles()`; CRUD de usuarios (admin-only); reseteo de contraseña por admin | ✅ Implementado y verificado el 21/07/2026 con colección de Postman (13 requests, incluye login admin/técnico, 403 por rol, 400 por password débil, 400 autobloqueo de admin, ciclo completo de reset-password, y soft-delete verificando que el registro no se borra físicamente). Todos los tests en verde. Pendiente de commitear. |
-| 007.4 | `createdBy` en `Material` e `InventoryMovement` (requiere el usuario autenticado del request) | ✅ Implementado y verificado el 21/07/2026 con colección de Postman (6 requests): material creado por `admin` trae `createdBy:"admin"`, movimiento creado por `tecnico1` trae `createdBy:"tecnico1"`, y los registros anteriores a este checkpoint siguen respondiendo con `createdBy:null` sin romper la lista. Todos los tests en verde. Pendiente de commitear. |
-| 007.5 | Frontend: página de login, rutas protegidas, UI condicionada por rol | Pendiente |
+| 007.3 | `RolesGuard`/`@Roles()`; CRUD de usuarios (admin-only); reseteo de contraseña por admin | ✅ Implementado, verificado (13/13 Postman) y commiteado (`a955cc6`, 21/07/2026). |
+| 007.4 | `createdBy` en `Material` e `InventoryMovement` (requiere el usuario autenticado del request) | ✅ Implementado, verificado (6/6 Postman) y commiteado (`2f25759`, 21/07/2026). |
+| 007.5 | Frontend: página de login, rutas protegidas, UI condicionada por rol | ✅ Implementado y verificado en navegador el 21/07/2026 (login, cookies, middleware de rutas protegidas, header condicionado por rol, bloqueo de `/users` para no-admin, creación de material y de movimiento de inventario como `tecnico1` de punta a punta). Pendiente de commitear. |
 
 **Nota sobre bootstrap de usuarios:** no existe endpoint HTTP de registro todavía (por diseño, se deja para 007.3 con guard admin-only). El primer usuario admin se crea con el script `npm run seed:test-user` (acepta username/password/role por argumento) — necesario porque un endpoint admin-only no puede usarse antes de que exista un admin. Este script queda como herramienta de desarrollo/bootstrap, no como parte de la API pública.
 
@@ -192,6 +199,22 @@ Fuentes: `01-objetivo-y-alcance.md` a `05-modulos-del-sistema.md`, `gemini-code-
 - **Bloqueo de login**: 2 intentos fallidos → bloqueo de 5 min. Regla a implementar cuando se construya el módulo de autenticación (aún no iniciado).
 - **RNFs generales** (rendimiento <2s, disponibilidad 99%, seguridad JWT/hash+salt): documentados en la especificación original, pendientes de verificar contra la implementación cuando corresponda.
 
+## Bug encontrado durante la prueba manual de 007.5 (21/07/2026) — no relacionado con auth
+
+Al probar el flujo completo en el navegador como `tecnico1`, crear un material falla con "No fue posible guardar el material." El login, las cookies y el bloqueo de `/users` por rol funcionaron correctamente — el bug es previo y ajeno a 007.5.
+
+**Causa real**: `MaterialForm.tsx` envía `currentStock` en el body de `POST /materials`, pero `CreateMaterialDto` (backend) no tiene ese campo, y `main.ts` tiene `ValidationPipe({ forbidNonWhitelisted: true })` — rechaza con 400 cualquier propiedad fuera del DTO, para cualquier usuario. `UpdateMaterialDto` extiende el mismo DTO (`PartialType(CreateMaterialDto)`), así que **editar un material está igual de roto**, no solo crear. Nunca se había probado esta parte del frontend de punta a punta en navegador.
+
+**Hallazgo adicional**: ni siquiera debería existir un campo "Stock actual" editable en el formulario de Material — la regla de negocio ya documentada dice "Todo cambio de stock debe realizarse mediante InventoryMovement". El campo se quita, no se corrige para que pase la validación.
+
+**Corregido y verificado en navegador (21/07/2026)**: se quitó `currentStock` de `CreateMaterialDto` (frontend) y del formulario (crear y editar), y se agregó manejo de errores real (`extractErrorMessage`) en `materials.service.ts` + `MaterialForm.tsx`, igual que ya tenía `inventory-movements`. Confirmado por el usuario: crear y editar un material como `tecnico1` funciona.
+
+## 007.5 — verificado en navegador (21/07/2026)
+
+Probado manualmente por el usuario (no solo `next build`): login redirige correctamente, cookie de sesión funciona, middleware bloquea rutas sin sesión, header muestra username/role, link "Usuarios" solo visible para ADMIN, `/users` redirige si un no-admin intenta entrar por URL directa, logout limpia la sesión. Creación de material y de movimiento de inventario como `tecnico1` confirmadas de punta a punta (esto último ya incluye el fix del bug de Material de arriba). Pendiente de commitear.
+
+Durante la verificación se encontró y corrigió un bug adicional (router cache del cliente): `LoginForm.tsx` y `LogoutButton.tsx` no llamaban `router.refresh()` antes de navegar, así que el header (en `app/layout.tsx`) seguía mostrando el estado viejo tras login/logout — mismo patrón que el bug ya documentado del 19/07/2026 en `MaterialForm`/`InventoryMovementForm`. Corregido agregando `router.refresh()` en ambos.
+
 ## Pendientes por verificar (abiertos, sin confirmar aún)
 
 - Ninguno crítico. Los dos pendientes anteriores (estado real de update/remove, y contenido de los documentos 01-05/gemini-code) quedaron resueltos y confirmados el 18/07/2026.
@@ -201,10 +224,10 @@ Fuentes: `01-objetivo-y-alcance.md` a `05-modulos-del-sistema.md`, `gemini-code-
 1. **Auto-degradación de rol**: `PATCH /users/:id` bloquea que un admin se desactive a sí mismo (`isActive:false`), pero NO bloquea que un admin se cambie su propio `role` a TECNICO/COORDINADOR. Si el único admin activo hace esto por error, queda en la misma situación que la protección de auto-bloqueo buscaba evitar. Sin decidir aún si vale la pena bloquearlo también.
 2. **Código de estado de `/auth/login`**: devuelve `201` (default de Nest para `@Post()` sin `@HttpCode`), no `200`. Es válido, pero si se prefiere el convencional `200` para login, es un cambio de una línea. Sin decidir.
 
-## 007.3 — verificado (21/07/2026)
+## 007.3 — verificado y commiteado (21/07/2026)
 
-Validado con colección de Postman (`postman/ManteStock-007.3-Users.postman_collection.json`, 13 requests con tests automáticos) — 13/13 en verde. Cubre: rechazo por rol (403), rechazo por password débil (400), rechazo de autobloqueo de admin (400), ciclo completo de reset-password (clave vieja deja de servir, clave nueva funciona), y soft-delete (el registro no se borra físicamente, `isActive:false`). Pendiente de commitear.
+Validado con colección de Postman (`postman/ManteStock-007.3-Users.postman_collection.json`, 13 requests con tests automáticos) — 13/13 en verde. Cubre: rechazo por rol (403), rechazo por password débil (400), rechazo de autobloqueo de admin (400), ciclo completo de reset-password (clave vieja deja de servir, clave nueva funciona), y soft-delete (el registro no se borra físicamente, `isActive:false`). Commit `a955cc6`.
 
-## 007.4 — verificado (21/07/2026)
+## 007.4 — verificado y commiteado (21/07/2026)
 
-Validado con colección de Postman (`postman/ManteStock-007.4-CreatedBy.postman_collection.json`, 6 requests) — todos en verde. Cubre: `POST /materials` como `admin` devuelve `createdBy:"admin"`, `POST /inventory-movements` como `tecnico1` devuelve `createdBy:"tecnico1"`, el valor persiste al releer el material por id, y la lista completa de materiales no se rompe con registros antiguos en `createdBy:null`. Pendiente de commitear.
+Validado con colección de Postman (`postman/ManteStock-007.4-CreatedBy.postman_collection.json`, 6 requests) — todos en verde. Cubre: `POST /materials` como `admin` devuelve `createdBy:"admin"`, `POST /inventory-movements` como `tecnico1` devuelve `createdBy:"tecnico1"`, el valor persiste al releer el material por id, y la lista completa de materiales no se rompe con registros antiguos en `createdBy:null`. Commit `2f25759`.

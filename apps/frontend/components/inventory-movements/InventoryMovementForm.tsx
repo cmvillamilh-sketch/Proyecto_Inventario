@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { getMaterials } from '../../services/materials.service';
 import { inventoryMovementsService } from '../../services/inventory-movements.service';
+import { getClientToken } from '../../lib/auth/client';
 import { Material } from '../../types/material';
 import { MovementType } from '../../types/inventory-movement';
 import { CreateInventoryMovementDto } from '../../types/inventory-movement.dto';
@@ -32,7 +33,7 @@ export default function InventoryMovementForm() {
   useEffect(() => {
     let isMounted = true;
 
-    getMaterials()
+    getMaterials(getClientToken() ?? '')
       .then((data) => {
         if (isMounted) {
           setMaterials(data);
@@ -68,7 +69,7 @@ export default function InventoryMovementForm() {
     setIsSubmitting(true);
 
     try {
-      await inventoryMovementsService.create(form);
+      await inventoryMovementsService.create(form, getClientToken() ?? '');
       setForm(initialFormState);
       router.refresh();
       router.push('/inventory-movements');

@@ -13,8 +13,12 @@ async function extractErrorMessage(response: Response): Promise<string> {
   return message || 'Ocurrió un error inesperado.';
 }
 
-async function getAll(): Promise<InventoryMovement[]> {
-  const response = await fetch(`${API_BASE_URL}/inventory-movements`);
+async function getAll(token: string): Promise<InventoryMovement[]> {
+  const response = await fetch(`${API_BASE_URL}/inventory-movements`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   if (!response.ok) {
     throw new Error(await extractErrorMessage(response));
@@ -23,8 +27,12 @@ async function getAll(): Promise<InventoryMovement[]> {
   return response.json();
 }
 
-async function getOne(id: string): Promise<InventoryMovement> {
-  const response = await fetch(`${API_BASE_URL}/inventory-movements/${id}`);
+async function getOne(id: string, token: string): Promise<InventoryMovement> {
+  const response = await fetch(`${API_BASE_URL}/inventory-movements/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   if (!response.ok) {
     throw new Error(await extractErrorMessage(response));
@@ -33,11 +41,12 @@ async function getOne(id: string): Promise<InventoryMovement> {
   return response.json();
 }
 
-async function create(dto: CreateInventoryMovementDto): Promise<InventoryMovement> {
+async function create(dto: CreateInventoryMovementDto, token: string): Promise<InventoryMovement> {
   const response = await fetch(`${API_BASE_URL}/inventory-movements`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(dto),
   });

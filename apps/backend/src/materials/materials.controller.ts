@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { MaterialsService } from './materials.service';
 import { CreateMaterialDto } from './dto/create-material.dto';
 import { UpdateMaterialDto } from './dto/update-material.dto';
@@ -11,8 +11,13 @@ export class MaterialsController {
   constructor(private readonly materialsService: MaterialsService) {}
 
   @Get()
-  findAll() {
-    return this.materialsService.findAll();
+  findAll(@Query('search') search?: string) {
+    return this.materialsService.findAll(search);
+  }
+
+  @Get('summary')
+  getSummary() {
+    return this.materialsService.getSummary();
   }
 
   @Get(':id')

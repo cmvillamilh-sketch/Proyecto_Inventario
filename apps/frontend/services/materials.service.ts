@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '../lib/api';
-import { Material } from '../types/material';
+import { Material, MaterialsSummary } from '../types/material';
 import { CreateMaterialDto, UpdateMaterialDto } from '../types/material.dto';
 
 async function extractErrorMessage(response: Response): Promise<string> {
@@ -13,8 +13,31 @@ async function extractErrorMessage(response: Response): Promise<string> {
   return message || 'Ocurrió un error inesperado.';
 }
 
-export async function getMaterials(token: string): Promise<Material[]> {
-  const response = await fetch(`${API_BASE_URL}/materials`, {
+export async function getMaterials(token: string, search?: string): Promise<Material[]> {
+  const params = new URLSearchParams();
+
+  if (search) {
+    params.set('search', search);
+  }
+
+  const queryString = params.toString();
+  const url = queryString ? `${API_BASE_URL}/materials?${queryString}` : `${API_BASE_URL}/materials`;
+
+  const response = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(await extractErrorMessage(response));
+  }
+
+  return response.json();
+}
+
+export async function getMaterialsSummary(token: string): Promise<MaterialsSummary> {
+  const response = await fetch(`${API_BASE_URL}/materials/summary`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

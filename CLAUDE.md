@@ -123,11 +123,31 @@ Decisiones:
 3. **Frontend**: formulario `<form method="GET">` nativo sobre `/inventory-movements`, sin JavaScript ni Client Component — al enviar, cambia la URL con los query params y el Server Component se re-renderiza filtrado. Consistente con el patrón `force-dynamic` que ya usa esta página.
 4. **Alcance por rol**: sin cambios — el endpoint sigue abierto a cualquier usuario autenticado (no se agregó `@Roles()` aquí, misma decisión que en 007.3 para Materials/InventoryMovements).
 
+## Decisión de alcance (21/07/2026)
+
+**Módulo de Notificaciones: fuera del alcance de esta entrega.** Decisión explícita del usuario. Queda documentado como descartado, no como pendiente — no debe volver a aparecer en la lista de "próximos pasos" salvo que se reconsidere explícitamente. El alcance del MVP para la entrega del jueves queda en 5 módulos: Autenticación, Materiales, Inventory Movements, Trazabilidad/auditoría, y Consulta/Dashboard.
+
+## Checkpoint 009 — Consulta y Dashboard (arquitectura, 21/07/2026)
+
+Fuente literal: `05-modulos-del-sistema.md` y `gemini-code-1784071345471.md` (sección "Módulo de Consulta y Dashboard"). Funciones especificadas: vista general de stock, búsqueda y filtros de materiales, indicadores básicos (materiales con stock bajo).
+
+Diseño:
+1. **Backend — `GET /materials/summary`** (nuevo endpoint, mismo controller/service de Materials): devuelve `{ totalMaterials, totalStockUnits, lowStockCount, lowStockMaterials: Material[] }`. "Stock bajo" se define como `currentStock <= minimumStock` (no solo `<`, para que el punto exacto del mínimo ya cuente como alerta). **Debe declararse antes que `@Get(':id')` en el controller** — si no, Nest intenta interpretar "summary" como el `:id` y `ParseUUIDPipe` lo rechaza con 400.
+2. **Backend — búsqueda en `GET /materials`**: acepta un query param opcional `search` (código o descripción, `ILike` parcial, no distingue mayúsculas/minúsculas). Esta función está especificada tanto en el módulo de catálogo de materiales como en el de Consulta/Dashboard — se implementa una sola vez en `GET /materials`, cubre ambas menciones de la especificación.
+3. **Excepción al congelamiento de Material**: igual que con `createdBy` en 007.4, se toca `MaterialsController`/`MaterialsService` (módulo "congelado") porque la función está explícitamente pedida por la especificación de este checkpoint, no es una mejora fuera de alcance.
+4. **Frontend — `/` pasa a ser el dashboard real**, reemplazando el placeholder estático. Vista con: tarjetas de indicadores (total de materiales, unidades totales en stock, cantidad con stock bajo) y una tabla de materiales con stock bajo.
+5. **Cambio de decisión de 007.5**: la redirección post-login cambia de `/materials` a `/` (antes `/` era un placeholder sin contenido real, ahora es el dashboard — tiene sentido que sea el destino natural tras iniciar sesión). Se agrega un link "Dashboard" a la barra de navegación en `app/layout.tsx`.
+6. **Búsqueda de materiales en el frontend**: se agrega un campo de búsqueda en `/materials` (mismo patrón `<form method="GET">` sin JavaScript que ya se usa en los filtros de `/inventory-movements`), no en el dashboard — tiene más sentido de uso ahí.
+
+## Checkpoint 009 — verificado (21/07/2026)
+
+Backend validado con colección de Postman (`postman/ManteStock-009-Dashboard.postman_collection.json`, 4 requests) — todos en verde: `GET /materials/summary` no lo confunde con `:id` (orden de rutas correcto), `lowStockCount` coincide con el largo del array, todos los `lowStockMaterials` cumplen `currentStock <= minimumStock`, la búsqueda parcial funciona sin distinguir mayúsculas, y una búsqueda sin resultados devuelve array vacío sin romper. Frontend validado en navegador: login redirige a `/` (dashboard) con las 3 tarjetas y la tabla de stock bajo, link "Dashboard" en la nav, búsqueda en `/materials` cambia la URL y filtra, "Limpiar" vuelve a la lista completa. Pendiente de commitear.
+
 ## Próximo objetivo
 
-Checkpoints 007 (Autenticación) y 008 (Trazabilidad y auditoría) completos y verificados — commits pendientes de confirmar.
+Checkpoints 007 (Autenticación), 008 (Trazabilidad y auditoría) y 009 (Consulta y Dashboard) completos y verificados — commits pendientes de confirmar.
 
-Según `05-modulos-del-sistema.md` y `gemini-code-1784071345471.md`, del alcance total del MVP (6 módulos) quedan pendientes: Consulta/dashboard (0%) y Notificaciones (0%). Materiales, Inventory Movements, Autenticación y Trazabilidad/auditoría están al 100%. Pendiente de decidir con el usuario qué priorizar antes de la entrega del jueves.
+**Los 5 módulos del alcance de esta entrega (Materiales, Inventory Movements, Autenticación, Trazabilidad/auditoría, Consulta/Dashboard) están al 100%.** Notificaciones queda descartado (decisión del 21/07/2026, no es un pendiente). Falta: confirmar todos los commits pendientes, y decidir con el usuario si se hace una revisión final / documento de entrega para el jueves.
 
 ---
 

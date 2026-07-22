@@ -22,6 +22,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               {auth.username} ({auth.role})
             </span>
             <nav>
+              <Link href="/">Dashboard</Link>
               <Link href="/materials">Materiales</Link>
               <Link href="/inventory-movements">Inventario</Link>
               {auth.role === 'ADMIN' ? <Link href="/users">Usuarios</Link> : null}

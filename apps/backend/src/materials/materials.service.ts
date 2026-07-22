@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { QueryFailedError, Repository } from 'typeorm';
+import { ILike, QueryFailedError, Repository } from 'typeorm';
 import { Material } from './entities/material.entity';
 import { CreateMaterialDto } from './dto/create-material.dto';
 import { UpdateMaterialDto } from './dto/update-material.dto';
@@ -12,8 +12,26 @@ export class MaterialsService {
     private readonly materialRepository: Repository<Material>,
   ) {}
 
-  async findAll() {
+  async findAll(search?: string) {
+    if (search) {
+      return this.materialRepository.find({
+        where: [{ code: ILike(`%${search}%`) }, { description: ILike(`%${search}%`) }],
+      });
+    }
+
     return this.materialRepository.find();
+  }
+
+  async getSummary() {
+    const materials = await this.materialRepository.find();
+    const lowStockMaterials = materials.filter((material) => material.currentStock <= material.minimumStock);
+
+    return {
+      totalMaterials: materials.length,
+      totalStockUnits: materials.reduce((sum, material) => sum + material.currentStock, 0),
+      lowStockCount: lowStockMaterials.length,
+      lowStockMaterials,
+    };
   }
 
   async findOne(id: string) {

@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createMaterial, updateMaterial } from '../../services/materials.service';
+import { getClientToken } from '../../lib/auth/client';
 import { Material } from '../../types/material';
 import { CreateMaterialDto } from '../../types/material.dto';
 
@@ -12,7 +13,6 @@ const initialFormState: CreateMaterialDto = {
   category: '',
   unitOfMeasure: '',
   minimumStock: 0,
-  currentStock: 0,
 };
 
 interface MaterialFormProps {
@@ -33,7 +33,6 @@ export default function MaterialForm({ initialData }: MaterialFormProps) {
         category: initialData.category,
         unitOfMeasure: initialData.unitOfMeasure,
         minimumStock: initialData.minimumStock,
-        currentStock: initialData.currentStock,
       });
     }
   }, [initialData]);
@@ -51,17 +50,19 @@ export default function MaterialForm({ initialData }: MaterialFormProps) {
     setIsSubmitting(true);
 
     try {
+      const token = getClientToken() ?? '';
+
       if (initialData) {
-        await updateMaterial(initialData.id, form);
+        await updateMaterial(initialData.id, form, token);
       } else {
-        await createMaterial(form);
+        await createMaterial(form, token);
       }
 
       setForm(initialFormState);
       router.refresh();
       router.push('/materials');
     } catch (error) {
-      setErrorMessage('No fue posible guardar el material.');
+      setErrorMessage(error instanceof Error ? error.message : 'No fue posible guardar el material.');
     } finally {
       setIsSubmitting(false);
     }
@@ -88,10 +89,6 @@ export default function MaterialForm({ initialData }: MaterialFormProps) {
       <div>
         <label htmlFor="minimumStock">Stock mínimo</label>
         <input id="minimumStock" name="minimumStock" type="number" value={form.minimumStock} onChange={handleChange} disabled={isSubmitting} />
-      </div>
-      <div>
-        <label htmlFor="currentStock">Stock actual</label>
-        <input id="currentStock" name="currentStock" type="number" value={form.currentStock} onChange={handleChange} disabled={isSubmitting} />
       </div>
       <button type="submit" disabled={isSubmitting}>
         {isSubmitting ? 'Guardando...' : 'Guardar'}

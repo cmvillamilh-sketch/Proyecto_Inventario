@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ManteStock — Manual de instalación desde cero</title>
+<style>
+  :root {
+    --blue: #2563eb;
+    --blue-bg: #eff6ff;
+    --green: #1a7f37;
+    --green-bg: #e6f4ea;
+    --red: #b91c1c;
+    --red-bg: #fef2f2;
+    --amber: #9a6700;
+    --amber-bg: #fff8e5;
+    --gray: #57606a;
+    --border: #d0d7de;
+    --text: #1f2328;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text);
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    line-height: 1.6;
+  }
+  h1 { font-size: 1.9rem; margin-bottom: 2px; }
+  .subtitle { color: var(--gray); margin-top: 0; }
+  h2 {
+    font-size: 1.25rem;
+    margin-top: 42px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--blue);
+    color: #111827;
+  }
+  h3 { font-size: 1.02rem; margin-top: 22px; color: #111827; }
+  .step {
+    display: flex;
+    gap: 14px;
+    margin: 14px 0;
+    align-items: flex-start;
+  }
+  .step-num {
+    flex: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--blue);
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .step-text { padding-top: 2px; width: 100%; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 0.92rem;
+  }
+  th, td {
+    text-align: left;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    vertical-align: top;
+  }
+  th { background: #f6f8fa; font-weight: 600; }
+  code {
+    background: #f6f8fa;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    border: 1px solid var(--border);
+  }
+  pre {
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 14px 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    margin: 12px 0;
+  }
+  pre code { background: none; border: none; padding: 0; color: inherit; }
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+  .badge-green { background: var(--green-bg); color: var(--green); }
+  .note-box {
+    background: var(--blue-bg);
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 0.92rem;
+  }
+  .warn-box {
+    background: var(--amber-bg);
+    border: 1px solid #f0dca0;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 0.92rem;
+  }
+  .deny-box {
+    background: var(--red-bg);
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 0.92rem;
+  }
+  ul, ol { padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  .footer {
+    margin-top: 60px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 0.82rem;
+    color: var(--gray);
+  }
+</style>
+</head>
+<body>
+
+<h1>ManteStock — Manual de instalación desde cero</h1>
+<p class="subtitle">Pasos para levantar el proyecto completo (backend + frontend + base de datos) en un computador nuevo</p>
+
+<div class="note-box">
+  El código todavía no está mezclado en <code>main</code>. Hoy vive en la rama <code>feature/checkpoints-007-010</code>, pendiente de Pull Request. Este manual asume que se instala desde esa rama.
+</div>
+
+<h2>1. Requisitos previos</h2>
+<table>
+  <thead><tr><th>Herramienta</th><th>Versión / detalle</th></tr></thead>
+  <tbody>
+    <tr><td>Node.js</td><td><strong>20.x</strong> — obligatorio, versiones distintas dan problemas de compatibilidad con Next.js 14 en Windows.</td></tr>
+    <tr><td>npm</td><td>Viene incluido con Node.js.</td></tr>
+    <tr><td>Docker Desktop</td><td>Para levantar PostgreSQL en contenedor (opción recomendada). Alternativa: PostgreSQL 16 instalado localmente.</td></tr>
+    <tr><td>Git</td><td>Para clonar el repositorio.</td></tr>
+  </tbody>
+</table>
+<div class="step"><div class="step-num">1</div><div class="step-text">Verifica tu versión de Node:
+<pre><code>node -v</code></pre>
+Debe mostrar <code>v20.x.x</code>. Si tienes otra versión, instala Node 20 (por ejemplo con <a href="https://nodejs.org">nodejs.org</a> o un gestor de versiones como <code>nvm</code>).</div></div>
+
+<h2>2. Clonar el repositorio</h2>
+<div class="step"><div class="step-num">1</div><div class="step-text">Clona el repositorio y entra a la carpeta:
+<pre><code>git clone https://github.com/cmvillamilh-sketch/Proyecto_Inventario.git
+cd Proyecto_Inventario</code></pre></div></div>
+<div class="step"><div class="step-num">2</div><div class="step-text">Cambia a la rama de trabajo (el checkpoint más reciente no está en <code>main</code> todavía):
+<pre><code>git checkout feature/checkpoints-007-010</code></pre></div></div>
+
+<h2>3. Configurar variables de entorno</h2>
+<div class="step"><div class="step-num">1</div><div class="step-text">Copia el archivo de ejemplo a <code>.env</code> en la raíz del proyecto:
+<pre><code>copy .env.example .env</code></pre>
+(en Mac/Linux sería <code>cp .env.example .env</code>)</div></div>
+<div class="step"><div class="step-num">2</div><div class="step-text">Revisa el contenido de <code>.env</code>:
+<pre><code>POSTGRES_DB=mante_stock
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_PORT=5432
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/mante_stock
+JWT_SECRET=change-me
+NEXT_PUBLIC_API_URL=http://localhost:3001</code></pre>
+Para levantar el proyecto en tu propio equipo, estos valores por defecto sirven tal cual. Solo cámbialos si ya tienes algo corriendo en esos puertos.</div></div>
+<div class="warn-box">
+  <strong><code>JWT_SECRET=change-me</code> es un valor de desarrollo</strong>, aceptado para instalar y probar el proyecto localmente. Si este proyecto llegara a desplegarse en un servidor real, ese valor debe reemplazarse por un secreto fuerte y único.
+</div>
+
+<h2>4. Instalar dependencias</h2>
+<div class="step"><div class="step-num">1</div><div class="step-text">Desde la raíz del proyecto (es un monorepo con npm Workspaces, un solo <code>install</code> cubre backend y frontend):
+<pre><code>npm install</code></pre></div></div>
+
+<h2>5. Levantar la base de datos</h2>
+<div class="step"><div class="step-num">1</div><div class="step-text">Con Docker Desktop abierto, levanta PostgreSQL 16 en contenedor:
+<pre><code>npm run docker:up</code></pre>
+Esto crea el contenedor <code>mante-stock-postgres</code>, escuchando en el puerto <code>5432</code>.</div></div>
+<div class="note-box">
+  No hace falta crear tablas a mano: el backend usa <code>synchronize: true</code> en desarrollo, así que TypeORM crea el esquema automáticamente la primera vez que arranca.
+</div>
+
+<h2>6. Crear usuarios (administrador, técnico, coordinador)</h2>
+<p>No existe una pantalla de registro pública (a propósito — la creación de usuarios es admin-only). Hay dos formas de crear usuarios; usa la que corresponda en cada caso.</p>
+
+<h3>6.1 Primer usuario (obligatorio) — script de bootstrap</h3>
+<p>Antes de tener un administrador, no hay forma de autenticarse contra la API para crear usuarios por ese camino. Por eso el <strong>primer</strong> usuario (debe ser <code>ADMIN</code>) se crea con un script de bootstrap, ejecutado directo contra la base de datos:</p>
+<div class="step"><div class="step-num">1</div><div class="step-text">Con la base de datos ya levantada (paso 5), ejecuta:
+<pre><code>npm run seed:test-user --workspace apps/backend -- admin Admin123! ADMIN</code></pre>
+Los tres argumentos son opcionales — si no los pasas, usa por defecto <code>admin</code> / <code>Admin123!</code> / <code>ADMIN</code>.</div></div>
+<div class="step"><div class="step-num">2</div><div class="step-text">La consola confirma el usuario creado (o avisa si ese <code>username</code> ya existía, sin duplicarlo). Guarda esas credenciales.</div></div>
+
+<h3>6.2 Resto de usuarios (técnico, coordinador, u otros admin) — dos opciones</h3>
+<div class="note-box">
+  El script de bootstrap no está limitado a un solo uso: acepta cualquier <code>username</code>/<code>password</code>/<code>role</code>, así que también sirve para crear técnicos y coordinadores de prueba sin necesidad de Postman. La vía por API es la que realmente usará un administrador ya en funcionamiento, porque queda autenticada y registrada como acción suya.</div>
+
+<p><strong>Opción A — repetir el script de bootstrap</strong> (rápido, para poblar datos de prueba):</p>
+<pre><code>npm run seed:test-user --workspace apps/backend -- tecnico1 Tecnico123 TECNICO
+npm run seed:test-user --workspace apps/backend -- coordinador1 Coord123X COORDINADOR</code></pre>
+
+<p><strong>Opción B — API, con el backend corriendo</strong> (paso 7), usando el token del administrador creado en 6.1:</p>
+<div class="step"><div class="step-num">1</div><div class="step-text">Inicia sesión como administrador (<code>POST /auth/login</code> o desde <code>/login</code> en el navegador) y copia el <code>accessToken</code> que devuelve.</div></div>
+<div class="step"><div class="step-num">2</div><div class="step-text">Con Postman (u otra herramienta), envía, incluyendo el header <code>Authorization: Bearer &lt;accessToken&gt;</code>:
+<pre><code>POST http://localhost:3001/users
+{
+  "username": "tecnico1",
+  "password": "Tecnico123",
+  "role": "TECNICO"
+}</code></pre>
+<code>role</code> acepta <code>TECNICO</code>, <code>COORDINADOR</code> o <code>ADMIN</code>. La contraseña debe tener mínimo 8 caracteres, con mayúscula, minúscula y número.</div></div>
+<div class="step"><div class="step-num">3</div><div class="step-text">Repite el paso anterior por cada usuario que necesites. El detalle completo de gestión de usuarios (cambiar rol, desactivar, resetear contraseña) está en la guía funcional del Administrador.</div></div>
+
+<h2>7. Arrancar backend y frontend</h2>
+<p>Se ejecutan en dos terminales separadas, ambas desde la raíz del proyecto:</p>
+<table>
+  <thead><tr><th>Terminal</th><th>Comando</th><th>Puerto</th></tr></thead>
+  <tbody>
+    <tr><td>Backend (NestJS)</td><td><code>npm run dev:backend</code></td><td><code>http://localhost:3001</code></td></tr>
+    <tr><td>Frontend (Next.js)</td><td><code>npm run dev:frontend</code></td><td><code>http://localhost:3000</code></td></tr>
+  </tbody>
+</table>
+<div class="warn-box">
+  <strong>El backend NO responde en el puerto 3000</strong> — ese puerto es del frontend. Si vas a probar la API con Postman o similar, usa siempre <code>http://localhost:3001</code>.
+</div>
+
+<h2>8. Verificar que quedó funcionando</h2>
+<div class="step"><div class="step-num">1</div><div class="step-text"><strong>Backend:</strong> abre <code>http://localhost:3001/health</code> en el navegador. Debe responder algo como:
+<pre><code>{ "status": "ok", "service": "mante-stock-backend", "timestamp": "..." }</code></pre></div></div>
+<div class="step"><div class="step-num">2</div><div class="step-text"><strong>Frontend:</strong> abre <code>http://localhost:3000</code>. Debe redirigirte a la pantalla de login.</div></div>
+<div class="step"><div class="step-num">3</div><div class="step-text">Inicia sesión con el usuario administrador creado en el paso 6. Debes llegar al dashboard con las tarjetas de indicadores.</div></div>
+
+<h2>9. Problemas frecuentes</h2>
+<table>
+  <thead><tr><th>Síntoma</th><th>Causa probable</th><th>Solución</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>El backend no arranca: <code>Error: JWT_SECRET no esta definido</code></td>
+      <td>Falta el archivo <code>.env</code> o la variable <code>JWT_SECRET</code></td>
+      <td>Repite el paso 3 — el archivo <code>.env</code> debe estar en la raíz del proyecto.</td>
+    </tr>
+    <tr>
+      <td><code>/materials</code> o <code>/inventory-movements</code> dan error 401 en el frontend</td>
+      <td>No hay sesión iniciada, o el token expiró (dura 8 horas)</td>
+      <td>Vuelve a iniciar sesión desde <code>/login</code>.</td>
+    </tr>
+    <tr>
+      <td>Error de conexión a PostgreSQL</td>
+      <td>El contenedor no está corriendo</td>
+      <td>Verifica con <code>docker ps</code> que <code>mante-stock-postgres</code> aparezca activo; si no, repite <code>npm run docker:up</code>.</td>
+    </tr>
+    <tr>
+      <td>Errores raros de compatibilidad en Windows con Next.js</td>
+      <td>Versión de Node distinta a 20.x</td>
+      <td>Confirma <code>node -v</code> y reinstala Node 20 si hace falta.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="footer">
+  Manual basado en los scripts y archivos de configuración reales del repositorio (<code>package.json</code>, <code>docker-compose.yml</code>, <code>.env.example</code>, <code>seed-test-user.ts</code>) — no en la documentación original del proyecto.
+</div>
+
+</body>
+</html>

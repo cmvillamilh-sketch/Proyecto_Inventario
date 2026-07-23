@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ManteStock — Guía funcional para Administrador</title>
+<style>
+  :root {
+    --blue: #2563eb;
+    --blue-bg: #eff6ff;
+    --green: #1a7f37;
+    --green-bg: #e6f4ea;
+    --red: #b91c1c;
+    --red-bg: #fef2f2;
+    --amber: #9a6700;
+    --amber-bg: #fff8e5;
+    --gray: #57606a;
+    --border: #d0d7de;
+    --text: #1f2328;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text);
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    line-height: 1.6;
+  }
+  h1 { font-size: 1.9rem; margin-bottom: 2px; }
+  .subtitle { color: var(--gray); margin-top: 0; }
+  h2 {
+    font-size: 1.25rem;
+    margin-top: 42px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--blue);
+    color: #111827;
+  }
+  h3 { font-size: 1.02rem; margin-top: 22px; color: #111827; }
+  .step {
+    display: flex;
+    gap: 14px;
+    margin: 14px 0;
+    align-items: flex-start;
+  }
+  .step-num {
+    flex: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--blue);
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .step-text { padding-top: 2px; width: 100%; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 0.92rem;
+  }
+  th, td {
+    text-align: left;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    vertical-align: top;
+  }
+  th { background: #f6f8fa; font-weight: 600; }
+  code {
+    background: #f6f8fa;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    border: 1px solid var(--border);
+  }
+  pre {
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 14px 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    margin: 12px 0;
+  }
+  pre code { background: none; border: none; padding: 0; color: inherit; }
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+  .badge-green { background: var(--green-bg); color: var(--green); }
+  .badge-red { background: var(--red-bg); color: var(--red); }
+  .badge-amber { background: var(--amber-bg); color: var(--amber); }
+  .note-box {
+    background: var(--blue-bg);
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 0.92rem;
+  }
+  .warn-box {
+    background: var(--amber-bg);
+    border: 1px solid #f0dca0;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 0.92rem;
+  }
+  .deny-box {
+    background: var(--red-bg);
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 0.92rem;
+  }
+  ul, ol { padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  .footer {
+    margin-top: 60px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 0.82rem;
+    color: var(--gray);
+  }
+</style>
+</head>
+<body>
+
+<h1>ManteStock — Guía funcional para el rol Administrador</h1>
+<p class="subtitle">Todo lo que puede hacer un Técnico o Coordinador, más la gestión de usuarios del sistema</p>
+
+<div class="note-box">
+  El Administrador tiene el <strong>mismo acceso funcional</strong> que Técnico y Coordinador sobre Materiales e Inventario (no hay restricciones adicionales de rol en esos módulos). Esta guía se enfoca en lo que es <strong>exclusivo</strong> del rol Administrador; para el resto (materiales, movimientos, dashboard), la guía del Técnico aplica igual.
+</div>
+
+<h2>1. Iniciar sesión</h2>
+<div class="step"><div class="step-num">1</div><div class="step-text">Ingresa con tu usuario y contraseña de administrador. Igual que cualquier rol, dos intentos fallidos seguidos bloquean la cuenta por 5 minutos.</div></div>
+<div class="step"><div class="step-num">2</div><div class="step-text">En el encabezado, arriba a la derecha, verás tu <code>usuario (ADMIN)</code> y un enlace adicional <strong>Usuarios</strong> en el menú — ese enlace solo lo ve el rol Administrador.</div></div>
+
+<h2>2. Ver la lista de usuarios</h2>
+<div class="step"><div class="step-num">1</div><div class="step-text">Entra a <strong>Usuarios</strong> en el menú superior.</div></div>
+<div class="step"><div class="step-num">2</div><div class="step-text">Verás una tabla de solo lectura con: nombre de usuario, rol, y si está activo o no.</div></div>
+<div class="warn-box">
+  <strong>Esta pantalla es solo de consulta.</strong> Crear usuarios, cambiar su rol, resetear contraseñas o desactivarlos <strong>todavía no tiene botones en la interfaz</strong> — esas acciones se hacen por API (ver sección 3). Si un Técnico o Coordinador intenta entrar a <code>/users</code> directamente por la URL, el sistema lo redirige y no le muestra nada.
+</div>
+
+<h2>3. Gestionar usuarios (por API, con Postman u otra herramienta similar)</h2>
+<p>Mientras no exista la pantalla de gestión en el frontend, estas acciones se hacen enviando peticiones directas a <code>http://localhost:3001</code>, incluyendo el token de tu sesión de administrador en el header <code>Authorization: Bearer &lt;token&gt;</code>.</p>
+
+<h3>Crear un usuario nuevo</h3>
+<pre><code>POST /users
+{
+  "username": "tecnico2",
+  "password": "Clave123",
+  "role": "TECNICO"
+}</code></pre>
+<table>
+  <thead><tr><th>Campo</th><th>Regla</th></tr></thead>
+  <tbody>
+    <tr><td><code>username</code></td><td>Debe ser único — si ya existe, el sistema lo rechaza.</td></tr>
+    <tr><td><code>password</code></td><td>Mínimo 8 caracteres, con al menos una mayúscula, una minúscula y un número.</td></tr>
+    <tr><td><code>role</code></td><td><code>TECNICO</code>, <code>COORDINADOR</code> o <code>ADMIN</code>.</td></tr>
+  </tbody>
+</table>
+
+<h3>Cambiar el rol o desactivar un usuario</h3>
+<pre><code>PATCH /users/:id
+{ "role": "COORDINADOR" }
+
+PATCH /users/:id
+{ "isActive": false }</code></pre>
+<div class="deny-box">
+  <strong>Un administrador no puede desactivarse a sí mismo</strong> (ni con este <code>PATCH</code> ni con el <code>DELETE</code> de abajo) — el sistema lo rechaza, para que nunca quede el sistema sin ningún administrador activo.
+</div>
+
+<h3>Dar de baja a un usuario</h3>
+<pre><code>DELETE /users/:id</code></pre>
+<p>No borra el registro — lo marca como inactivo (<code>isActive: false</code>). El usuario deja de poder iniciar sesión, pero su historial de movimientos (<code>createdBy</code>) se conserva intacto.</p>
+
+<h3>Resetear la contraseña de un usuario</h3>
+<pre><code>PATCH /users/:id/reset-password
+{ "newPassword": "NuevaClave123" }</code></pre>
+<p>Es el único mecanismo de recuperación de contraseña que existe hoy — no hay recuperación por correo electrónico. Si un usuario olvida su clave, el administrador se la resetea manualmente por acá.</p>
+
+<h2>4. Qué NO cambia para el Administrador</h2>
+<ul>
+  <li>Los movimientos de inventario siguen siendo inmutables — ni siquiera el Administrador puede editarlos o eliminarlos una vez guardados.</li>
+  <li>El stock de un material solo cambia registrando un movimiento (entrada/salida/ajuste), nunca editando el material directamente.</li>
+</ul>
+
+<h2>5. Cerrar sesión</h2>
+<p>Presiona <strong>Cerrar sesión</strong> arriba a la derecha en cualquier pantalla.</p>
+
+<div class="footer">
+  Guía basada en el comportamiento real verificado del sistema (backend con Postman, frontend en navegador) — no en la especificación original. La gestión de usuarios por API se documenta aquí porque, a la fecha, no existe interfaz gráfica para esas acciones.
+</div>
+
+</body>
+</html>

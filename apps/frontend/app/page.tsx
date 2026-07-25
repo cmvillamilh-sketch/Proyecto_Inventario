@@ -14,7 +14,7 @@ export default async function HomePage() {
   return (
     <main className="max-w-5xl mx-auto px-6 py-8">
       <h1 className="text-2xl font-semibold text-gray-900 mb-6">ManteStock</h1>
-      <section className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
           <h2 className="text-sm font-medium text-gray-500">Total de materiales</h2>
           <p className="mt-1 text-3xl font-semibold text-gray-900">{summary.totalMaterials}</p>
@@ -26,6 +26,14 @@ export default async function HomePage() {
         <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
           <h2 className="text-sm font-medium text-gray-500">Materiales con stock bajo</h2>
           <p className="mt-1 text-3xl font-semibold text-gray-900">{summary.lowStockCount}</p>
+        </div>
+        <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+          <h2 className="text-sm font-medium text-gray-500">Valor total del inventario</h2>
+          <p className="mt-1 text-3xl font-semibold text-gray-900">
+            {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(
+              summary.totalInventoryValue,
+            )}
+          </p>
         </div>
       </section>
       <h2 className="text-lg font-semibold text-gray-900 mb-3">Materiales con stock bajo</h2>

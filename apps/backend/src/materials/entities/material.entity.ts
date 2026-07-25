@@ -27,6 +27,9 @@ export class Material {
   @Column({ type: 'varchar', nullable: true })
   createdBy: string | null;
 
+  @Column('int', { nullable: true })
+  unitValue: number | null;
+
   @OneToMany(() => InventoryMovement, (movement) => movement.material)
   movements: InventoryMovement[];
 }

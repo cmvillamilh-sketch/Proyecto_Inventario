@@ -36,6 +36,12 @@ export default function MaterialRow({ material }: MaterialRowProps) {
   };
 
   const isLowStock = material.currentStock <= material.minimumStock;
+  const unitValueLabel =
+    material.unitValue === null || material.unitValue === undefined
+      ? '—'
+      : new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(
+          material.unitValue,
+        );
 
   return (
     <tr className={isLowStock ? 'bg-amber-50' : 'hover:bg-gray-50'}>
@@ -45,6 +51,7 @@ export default function MaterialRow({ material }: MaterialRowProps) {
       <td className="px-4 py-3 text-sm text-gray-700">{material.unitOfMeasure}</td>
       <td className="px-4 py-3 text-sm text-gray-700">{material.minimumStock}</td>
       <td className="px-4 py-3 text-sm text-gray-700">{material.currentStock}</td>
+      <td className="px-4 py-3 text-sm text-gray-700">{unitValueLabel}</td>
       <td className="px-4 py-3 text-sm text-gray-700">
         <Link href={`/materials/${material.id}/edit`} className="text-blue-600 hover:text-blue-800 font-medium mr-3">
           Editar

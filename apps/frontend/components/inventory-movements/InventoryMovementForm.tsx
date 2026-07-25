@@ -84,6 +84,16 @@ export default function InventoryMovementForm() {
     'block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none';
   const labelClassName = 'block text-sm font-medium text-gray-700 mb-1';
 
+  const selectedMaterial = materials.find((material) => material.id === form.materialId);
+  const estimatedValueLabel =
+    selectedMaterial && selectedMaterial.unitValue !== null && selectedMaterial.unitValue !== undefined
+      ? `Valor estimado: ${new Intl.NumberFormat('es-CO', {
+          style: 'currency',
+          currency: 'COP',
+          maximumFractionDigits: 0,
+        }).format(form.quantity * selectedMaterial.unitValue)}`
+      : 'Valor estimado: no disponible (material sin valor unitario definido)';
+
   return (
     <form onSubmit={handleSubmit}>
       <div className="mb-4">
@@ -142,6 +152,7 @@ export default function InventoryMovementForm() {
           disabled={isSubmitting}
           className={fieldClassName}
         />
+        {form.materialId ? <p className="mt-1 text-sm text-gray-500">{estimatedValueLabel}</p> : null}
       </div>
       <div className="mb-4">
         <label htmlFor="reason" className={labelClassName}>

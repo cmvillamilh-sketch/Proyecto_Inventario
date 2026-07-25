@@ -143,6 +143,25 @@ Diseño:
 
 Backend validado con colección de Postman (`postman/ManteStock-009-Dashboard.postman_collection.json`, 4 requests) — todos en verde: `GET /materials/summary` no lo confunde con `:id` (orden de rutas correcto), `lowStockCount` coincide con el largo del array, todos los `lowStockMaterials` cumplen `currentStock <= minimumStock`, la búsqueda parcial funciona sin distinguir mayúsculas, y una búsqueda sin resultados devuelve array vacío sin romper. Frontend validado en navegador: login redirige a `/` (dashboard) con las 3 tarjetas y la tabla de stock bajo, link "Dashboard" en la nav, búsqueda en `/materials` cambia la URL y filtra, "Limpiar" vuelve a la lista completa. Pendiente de commitear.
 
+## Checkpoint 011 — Valor monetario de materiales (arquitectura, 24/07/2026)
+
+Solicitado explícitamente por el profesor tras la presentación: los materiales deben tener un valor monetario, para que ante un intercambio (trueque de materiales entre áreas/proveedores) se pueda saber cuánto dinero se está entregando y cuánto se puede pedir a cambio.
+
+Decisiones tomadas (usuario, 24/07/2026):
+
+1. **Tipo de dato:** `unitValue` como entero (pesos colombianos, sin centavos) — consistente con que el resto de cantidades del sistema (`currentStock`, `minimumStock`, `quantity`) ya son `int`.
+2. **Obligatoriedad:** opcional/`nullable`. Los 90 materiales ya cargados (checkpoint de carga de inventario, 22/07/2026) quedan con `unitValue: null` hasta que se editen; no se les asigna 0 automáticamente para no confundir "sin valor definido" con "vale cero".
+3. **Dónde se muestra:**
+   - Dashboard: nueva tarjeta "Valor total del inventario" = suma de `currentStock × (unitValue ?? 0)` de todos los materiales.
+   - Tabla de Materiales: nueva columna con el valor unitario formateado como moneda (`—` si es `null`).
+   - Formulario de registrar movimiento: al elegir un material y escribir una cantidad, se muestra en vivo el valor estimado de ese movimiento (`cantidad × unitValue` del material seleccionado) — cálculo del lado del cliente, sin llamada adicional al backend, para que el usuario sepa cuánto está entregando (EXIT) o cuánto está pidiendo (ENTRY) en un intercambio.
+
+**Fuera de alcance de este checkpoint:** no se persiste el valor dentro de cada `InventoryMovement` (no hay "snapshot" histórico del valor al momento del movimiento) — si el valor unitario de un material cambia después, el historial no se ve afectado retroactivamente porque no guarda el valor, solo la cantidad. Se documenta como posible mejora futura si se necesita ese nivel de auditoría financiera.
+
+**Excepción al congelamiento de Material:** igual que con `createdBy` (007.4) y `search`/`summary` (009), se vuelve a tocar el módulo "congelado" porque la función está explícitamente pedida, no es una mejora fuera de alcance.
+
+**Estado:** implementado por Claude Code (24/07/2026) y verificado contra el código real (entidad, DTO, service, tipos de frontend, `MaterialForm.tsx`, `MaterialRow.tsx`/`MaterialTable.tsx`, dashboard, `InventoryMovementForm.tsx`) — coincide exactamente con el diseño de arriba, sin desviaciones a las reglas de negocio (`currentStock` sigue sin editable, `InventoryMovement` sin campos nuevos, sin `@Roles()` agregado). `tsc --noEmit` pasó limpio en backend y frontend. **Verificado en navegador (24/07/2026):** se editaron dos materiales (`103005` stock 6, `103011` stock 22) asignándoles `unitValue: 5000`. La tabla de Materiales mostró "$ 5.000" en ambos y "—" en el resto (sin valor definido). La tarjeta "Valor total del inventario" del Dashboard mostró $140.000, que coincide exactamente con el cálculo esperado (6×5000 + 22×5000 = 140.000) — confirma que `totalInventoryValue` no solo suma valores unitarios, sino que pondera correctamente por `currentStock` de cada material. Verificado también el estimado en vivo del formulario de movimiento con un material sin valor definido: muestra "Valor estimado: no disponible (material sin valor unitario definido)", no "$0" — distingue correctamente "sin definir" de "vale cero". **Pendiente:** colección de Postman y commitear.
+
 ## Próximo objetivo
 
 Checkpoints 007 (Autenticación), 008 (Trazabilidad y auditoría) y 009 (Consulta y Dashboard) completos y verificados — commits pendientes de confirmar.

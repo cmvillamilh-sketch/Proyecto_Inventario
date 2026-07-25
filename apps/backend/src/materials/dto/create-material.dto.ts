@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsString } from 'class-validator';
+import { IsInt, IsNotEmpty, IsOptional, IsString, Min } from 'class-validator';
 
 export class CreateMaterialDto {
   @IsString()
@@ -19,4 +19,9 @@ export class CreateMaterialDto {
 
   @IsInt()
   minimumStock: number;
+
+  @IsInt()
+  @IsOptional()
+  @Min(0)
+  unitValue?: number;
 }

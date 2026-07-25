@@ -31,6 +31,7 @@ export class MaterialsService {
       totalStockUnits: materials.reduce((sum, material) => sum + material.currentStock, 0),
       lowStockCount: lowStockMaterials.length,
       lowStockMaterials,
+      totalInventoryValue: materials.reduce((sum, material) => sum + material.currentStock * (material.unitValue ?? 0), 0),
     };
   }
 

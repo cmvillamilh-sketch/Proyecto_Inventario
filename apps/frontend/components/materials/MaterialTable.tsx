@@ -34,6 +34,9 @@ export default function MaterialTable({ materials }: MaterialTableProps) {
               Stock actual
             </th>
             <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Valor unitario
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
               Acciones
             </th>
           </tr>

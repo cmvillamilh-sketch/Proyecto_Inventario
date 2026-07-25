@@ -6,6 +6,7 @@ export interface Material {
   unitOfMeasure: string;
   minimumStock: number;
   currentStock: number;
+  unitValue?: number | null;
 }
 
 export interface MaterialsSummary {
@@ -13,4 +14,5 @@ export interface MaterialsSummary {
   totalStockUnits: number;
   lowStockCount: number;
   lowStockMaterials: Material[];
+  totalInventoryValue: number;
 }

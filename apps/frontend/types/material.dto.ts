@@ -4,6 +4,7 @@ export interface CreateMaterialDto {
   category: string;
   unitOfMeasure: string;
   minimumStock: number;
+  unitValue?: number | null;
 }
 
 export interface UpdateMaterialDto {
@@ -13,4 +14,5 @@ export interface UpdateMaterialDto {
   unitOfMeasure?: string;
   minimumStock?: number;
   currentStock?: number;
+  unitValue?: number | null;
 }

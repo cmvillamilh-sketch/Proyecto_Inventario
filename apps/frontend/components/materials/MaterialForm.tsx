@@ -13,6 +13,7 @@ const initialFormState: CreateMaterialDto = {
   category: '',
   unitOfMeasure: '',
   minimumStock: 0,
+  unitValue: undefined,
 };
 
 interface MaterialFormProps {
@@ -33,6 +34,7 @@ export default function MaterialForm({ initialData }: MaterialFormProps) {
         category: initialData.category,
         unitOfMeasure: initialData.unitOfMeasure,
         minimumStock: initialData.minimumStock,
+        unitValue: initialData.unitValue ?? undefined,
       });
     }
   }, [initialData]);
@@ -40,6 +42,10 @@ export default function MaterialForm({ initialData }: MaterialFormProps) {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     const isNumericField = name === 'minimumStock' || name === 'currentStock';
+    if (name === 'unitValue') {
+      setForm((prev) => ({ ...prev, unitValue: value === '' ? undefined : Number(value) }));
+      return;
+    }
     const nextValue = isNumericField ? Number(value) : value;
     setForm((prev) => ({ ...prev, [name]: nextValue } as CreateMaterialDto));
   };
@@ -128,6 +134,21 @@ export default function MaterialForm({ initialData }: MaterialFormProps) {
           name="minimumStock"
           type="number"
           value={form.minimumStock}
+          onChange={handleChange}
+          disabled={isSubmitting}
+          className={fieldClassName}
+        />
+      </div>
+      <div className="mb-4">
+        <label htmlFor="unitValue" className={labelClassName}>
+          Valor unitario (COP)
+        </label>
+        <input
+          id="unitValue"
+          name="unitValue"
+          type="number"
+          min={0}
+          value={form.unitValue ?? ''}
           onChange={handleChange}
           disabled={isSubmitting}
           className={fieldClassName}

@@ -278,6 +278,18 @@ Decisiones de implementación (25/07/2026):
 
 **Alcance:** cambio de 2 líneas en cada archivo, sin tocar lógica de autenticación, cookies ni el resto de los componentes.
 
+## Decisión de entrega — autoría (25/07/2026)
+
+La guía de entrega del profesor indica textualmente que "la entrega es individual", pero el documento técnico lista a los 5 estudiantes del grupo (Francisco Javier Garvito Rojas, Óscar Arévalo Huertas, Ever Filadelfo Melo Delgado, Edison Yesid Quintero Castro, Claudia Marcela Villamil Huertas). Se preguntó explícitamente al usuario si la entrega debía hacerse a nombre de los 5 pese a esa discrepancia — **confirmado: sí, los 5 estudiantes**. Queda documentado como decisión explícita, no como descuido de la guía; si el profesor objeta el formato individual, es un punto a aclarar con él directamente, no algo que el equipo pasó por alto.
+
+## Actualización del documento técnico (25/07/2026)
+
+`documento-tecnico.md` / `ManteStock-Documento-Tecnico.pdf` se actualizaron para reflejar los checkpoints 011-016 (antes solo tenían el nombre/fecha de los 5 estudiantes actualizado, pero el contenido seguía describiendo el estado del 23/07). Se agregó: valor monetario (`unitValue`) en el MoSCOW, en el modelo de datos y en "Funcionalidades desarrolladas"; una nueva sección "5.6 Rediseño visual del dashboard y navegación" (sidebar, gráficas por categoría, estilo iOS, logo); y en "Qué faltó" dos limitaciones explícitas: los precios son estimaciones de mercado (no cotizaciones reales, con nota de honestidad académica) y no hay snapshot histórico del valor por movimiento. PDF regenerado (23 páginas), verificado visualmente con `pdftoppm` antes de reemplazar el archivo en el repositorio.
+
+## README — confirmado y corregido (25/07/2026)
+
+Se comparó `README.md` contra la sección "Instrucciones de ejecución local" del documento técnico (que sigue la guía del profesor). Faltaban dos pasos que sí estaban en el documento técnico pero no en el README: `git checkout feature/checkpoints-007-010` (el código vive en esa rama, no en `main`) y la creación del primer usuario administrador vía `npm run seed:test-user` (no existe registro público por diseño). Sin ambos pasos, alguien siguiendo el README desde cero no podría iniciar sesión. Corregido — el README ahora coincide con los pasos verificados del documento técnico.
+
 ## Próximo objetivo
 
 Checkpoints 007 (Autenticación), 008 (Trazabilidad y auditoría) y 009 (Consulta y Dashboard) completos y verificados — commits pendientes de confirmar.

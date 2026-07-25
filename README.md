@@ -46,18 +46,32 @@ Notificaciones queda fuera del alcance de esta entrega (decisión explícita del
 > Importante: para evitar incompatibilidades en Windows con Next.js 14, se recomienda usar Node.js 20.x.
 
 ## Configuración local
-1. Copia el archivo `.env.example` a `.env`
-2. Ajusta las variables para tu entorno local
-3. Instala las dependencias:
+1. Clona el repositorio y cambia a la rama de trabajo (el código descrito aquí vive en `feature/checkpoints-007-010`, no en `main` — ver "Estado del proyecto" más abajo):
+
+```powershell
+git checkout feature/checkpoints-007-010
+```
+
+2. Copia el archivo `.env.example` a `.env`
+3. Ajusta las variables para tu entorno local
+4. Instala las dependencias:
 
 ```powershell
 npm install
 ```
 
-4. Levanta PostgreSQL local:
+5. Levanta PostgreSQL local:
 
 ```powershell
 npm run docker:up
+```
+
+No hace falta crear tablas manualmente: `synchronize: true` en desarrollo hace que TypeORM las cree automáticamente al arrancar el backend.
+
+6. Crea el primer usuario administrador (no existe registro público — es admin-only por diseño):
+
+```powershell
+npm run seed:test-user --workspace apps/backend -- admin Admin123! ADMIN
 ```
 
 ## Ejecución del proyecto

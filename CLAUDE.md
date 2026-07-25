@@ -286,6 +286,8 @@ La guía de entrega del profesor indica textualmente que "la entrega es individu
 
 `documento-tecnico.md` / `ManteStock-Documento-Tecnico.pdf` se actualizaron para reflejar los checkpoints 011-016 (antes solo tenían el nombre/fecha de los 5 estudiantes actualizado, pero el contenido seguía describiendo el estado del 23/07). Se agregó: valor monetario (`unitValue`) en el MoSCOW, en el modelo de datos y en "Funcionalidades desarrolladas"; una nueva sección "5.6 Rediseño visual del dashboard y navegación" (sidebar, gráficas por categoría, estilo iOS, logo); y en "Qué faltó" dos limitaciones explícitas: los precios son estimaciones de mercado (no cotizaciones reales, con nota de honestidad académica) y no hay snapshot histórico del valor por movimiento. PDF regenerado (23 páginas), verificado visualmente con `pdftoppm` antes de reemplazar el archivo en el repositorio.
 
+**Segunda pasada (25/07/2026, después de la fusión con `main`):** el documento seguía diciendo que la integración a `main` estaba "pendiente" en tres lugares (portada, "Nota sobre el estado del repositorio", "Qué faltó" y "Cómo se abordaría en una siguiente etapa") — desactualizado tras la fusión real de hoy. Corregido: la portada ahora cita la rama `main`, la nota del repositorio confirma que `main` y `feature/checkpoints-007-010` están sincronizados, se quitó el bullet de "Pull Request pendiente" de "Qué faltó", y "Cómo se abordaría en una siguiente etapa" ya no lo lista como primer paso. PDF regenerado y verificado (`pdftotext` confirmó el texto nuevo en la página correspondiente) antes de reemplazar el archivo en `entrega/`.
+
 ## README — confirmado y corregido (25/07/2026)
 
 Se comparó `README.md` contra la sección "Instrucciones de ejecución local" del documento técnico (que sigue la guía del profesor). Faltaban dos pasos que sí estaban en el documento técnico pero no en el README: `git checkout feature/checkpoints-007-010` (el código vive en esa rama, no en `main`) y la creación del primer usuario administrador vía `npm run seed:test-user` (no existe registro público por diseño). Sin ambos pasos, alguien siguiendo el README desde cero no podría iniciar sesión. Corregido — el README ahora coincide con los pasos verificados del documento técnico.
@@ -326,13 +328,17 @@ Se movieron con `git mv` (preserva el historial de cada archivo). `README.md` ac
 
 **Pendiente de confirmar con evidencia real:** ejecución de los `git mv`/`del` por el usuario y verificación del `git status`/commit/push.
 
-## Próximo objetivo
+## Próximo objetivo (actualizado 25/07/2026)
 
-Checkpoints 007 (Autenticación), 008 (Trazabilidad y auditoría) y 009 (Consulta y Dashboard) completos y verificados — commits pendientes de confirmar.
+**Los 5 módulos del alcance de esta entrega (Materiales, Inventory Movements, Autenticación, Trazabilidad/auditoría, Consulta/Dashboard) están al 100%**, más los checkpoints 011-016 (valor monetario, sidebar, gráficas, rediseño iOS, limpieza de datos, logo). Notificaciones queda descartado (decisión del 21/07/2026, no es un pendiente).
 
-**Los 5 módulos del alcance de esta entrega (Materiales, Inventory Movements, Autenticación, Trazabilidad/auditoría, Consulta/Dashboard) están al 100%.** Notificaciones queda descartado (decisión del 21/07/2026, no es un pendiente).
+**`main` ya tiene todo el trabajo — la fusión se cerró el 25/07/2026** (ver la sección "Fusión con `main`" más abajo para el detalle completo: se descubrió que `main` tenía una implementación separada de un compañero con historia no relacionada, se reemplazó por completo con la historia real del proyecto vía `git push --force`, y quedó verificado que `main` y `feature/checkpoints-007-010` apuntan al mismo commit). Ya no queda ningún Pull Request pendiente — este documento anterior (22/07/2026) que decía que el merge quedaba pendiente ya no aplica, se conserva como referencia histórica de por qué el trabajo vivió un tiempo solo en la rama.
 
-**Decisión (22/07/2026): se subió el trabajo a GitHub, pero en una rama, no a `main`.** Se detectó una discrepancia con la metodología del curso (bitácora del profesor Andrés Sánchez, `ManteStock_Backup_2026-07-15.md`): exige Gitflow — nunca commitear directo a `main`, siempre rama + Pull Request + Code Review. Los 13 commits que estaban solo en `main` local se movieron a la rama `feature/checkpoints-007-010`, ya pusheada a `origin/feature/checkpoints-007-010`. `origin/main` sigue intacto (solo el commit inicial) — el merge a `main` vía Pull Request queda pendiente, a decidir cuándo hacerlo.
+**Único pendiente real para la entrega de hoy:** el Componente B de la guía del profesor (video de 3-6 min + capturas), que es tarea del usuario, no del código — ver `entrega/ManteStock-avance-porcentajes.html` para el desglose completo por componente.
+
+### Decisión histórica (22/07/2026) — por qué el trabajo vivió primero en una rama
+
+Se subió el trabajo a GitHub, pero en una rama, no a `main`, al detectar una discrepancia con la metodología del curso (bitácora del profesor Andrés Sánchez, `ManteStock_Backup_2026-07-15.md`): exige Gitflow — nunca commitear directo a `main`, siempre rama + Pull Request + Code Review. Los 13 commits que estaban solo en `main` local se movieron a la rama `feature/checkpoints-007-010`, pusheada a `origin/feature/checkpoints-007-010`. En ese momento `origin/main` seguía intacto (solo el commit inicial) y el merge quedó pendiente — resuelto el 25/07/2026 (ver sección "Fusión con `main`").
 
 ---
 

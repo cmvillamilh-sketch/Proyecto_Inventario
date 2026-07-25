@@ -7,3 +7,4 @@ npm-debug.log*
 .DS_Store
 apps/frontend/.next
 apps/backend/dist
+apps/frontend/tsconfig.tsbuildinfo

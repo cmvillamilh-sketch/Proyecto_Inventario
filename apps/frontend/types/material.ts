@@ -15,4 +15,6 @@ export interface MaterialsSummary {
   lowStockCount: number;
   lowStockMaterials: Material[];
   totalInventoryValue: number;
+  valueByCategory: { category: string; totalValue: number }[];
+  materialCountByCategory: { category: string; count: number }[];
 }

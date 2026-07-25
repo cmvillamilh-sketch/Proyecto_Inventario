@@ -162,6 +162,62 @@ Decisiones tomadas (usuario, 24/07/2026):
 
 **Estado:** implementado por Claude Code (24/07/2026) y verificado contra el código real (entidad, DTO, service, tipos de frontend, `MaterialForm.tsx`, `MaterialRow.tsx`/`MaterialTable.tsx`, dashboard, `InventoryMovementForm.tsx`) — coincide exactamente con el diseño de arriba, sin desviaciones a las reglas de negocio (`currentStock` sigue sin editable, `InventoryMovement` sin campos nuevos, sin `@Roles()` agregado). `tsc --noEmit` pasó limpio en backend y frontend. **Verificado en navegador (24/07/2026):** se editaron dos materiales (`103005` stock 6, `103011` stock 22) asignándoles `unitValue: 5000`. La tabla de Materiales mostró "$ 5.000" en ambos y "—" en el resto (sin valor definido). La tarjeta "Valor total del inventario" del Dashboard mostró $140.000, que coincide exactamente con el cálculo esperado (6×5000 + 22×5000 = 140.000) — confirma que `totalInventoryValue` no solo suma valores unitarios, sino que pondera correctamente por `currentStock` de cada material. Verificado también el estimado en vivo del formulario de movimiento con un material sin valor definido: muestra "Valor estimado: no disponible (material sin valor unitario definido)", no "$0" — distingue correctamente "sin definir" de "vale cero". **Pendiente:** colección de Postman y commitear.
 
+## Checkpoint 012 — Rediseño visual: sidebar tipo SaaS (arquitectura, 24/07/2026)
+
+Decisión del usuario, tras revisar 3 propuestas visuales (sidebar SaaS oscuro, industrial oscuro denso, corporativo claro con color): se elige el **sidebar SaaS**. Reemplaza el patrón de navegación horizontal (`app/layout.tsx`, del checkpoint 010) por un menú lateral fijo, oscuro, con iconos — sin tocar lógica de negocio ni rutas.
+
+Decisiones de diseño (24/07/2026):
+
+1. **Librería de iconos:** `lucide-react` (nueva dependencia del frontend) — liviana, se integra bien con Tailwind, no requiere configuración adicional.
+2. **Estructura:** `app/layout.tsx` pasa a renderizar un layout de dos columnas: `<aside>` fijo (sidebar oscuro, ancho ~224px) + área de contenido a la derecha con una barra superior (usuario/rol + cerrar sesión) y el contenido de cada página debajo.
+3. **Nuevo componente:** `components/layout/Sidebar.tsx` (Client Component, usa `usePathname` para resaltar la ruta activa) — se extrae del `layout.tsx` porque éste sigue siendo Server Component (necesita `getServerAuth()`). El layout le pasa `role` como prop para decidir si muestra el link "Usuarios" (solo ADMIN, misma regla ya existente).
+4. **Iconos por sección del menú:** Dashboard (`LayoutDashboard`), Materiales (`Package`), Inventario (`ClipboardList`), Usuarios (`Users`).
+5. **Dashboard (`app/page.tsx`):** cada tarjeta de indicador agrega un ícono dentro de un círculo de color (Materiales = azul, Unidades en stock = teal/verde, Stock bajo = ámbar, Valor del inventario = verde), replicando la propuesta elegida.
+6. **Responsive:** fuera de alcance por ahora — el sidebar queda fijo, sin menú hamburguesa para móvil (la app se usa en escritorio). Se documenta como mejora futura si se necesita.
+
+Es un cambio **puramente visual y de navegación** — no debe tocar llamadas a servicios, nombres de campos, ni lógica de ningún formulario o tabla ya construidos.
+
+**Estado:** implementado por Claude Code (25/07/2026) y verificado contra el código real. Archivos tocados, confirmados por diff: `apps/frontend/components/layout/Sidebar.tsx` (nuevo), `apps/frontend/app/layout.tsx` (layout de dos columnas), `apps/frontend/app/page.tsx` (íconos en las 4 tarjetas), `apps/frontend/package.json` + `package-lock.json` (dependencia `lucide-react`). Ningún `*.service.ts`, formulario ni tabla existente fue modificado — confirmado por `git status` scoped. `npx tsc --noEmit` pasó limpio.
+
+**Hallazgo menor, no bloqueante:** cada página sigue renderizando su propio `<main>`, que ahora queda anidado dentro del `<main className="flex-1">` de `layout.tsx` — dos elementos `<main>` anidados es inválido según el spec de HTML (un solo landmark por página). Es puramente semántico/accesibilidad, no visible para el usuario. Pendiente: cambiar el `<main>` interno de cada página por `<div>` en un follow-up menor.
+
+**Pendiente:** verificación en navegador (ruta activa resaltada, link "Usuarios" oculto para no-admin, íconos, logout) y commit/push.
+
+## Checkpoint 013 — Gráficas en el Dashboard (arquitectura, 25/07/2026)
+
+Decisión del usuario, tras revisar 3 opciones de layout (torta+barras lado a lado, barra ancha+torta pequeña, donut+barras de stock crítico): se elige la **opción 2** — barra horizontal ancha de "Valor del inventario por categoría" + torta pequeña de "Distribución de materiales por categoría", en una fila nueva debajo de las 4 tarjetas existentes.
+
+Decisiones de diseño (25/07/2026):
+
+1. **Dato nuevo requerido — backend:** `GET /materials/summary` (mismo endpoint de checkpoint 009) se extiende con dos arrays nuevos:
+   - `valueByCategory: { category: string; totalValue: number }[]` — suma de `currentStock × (unitValue ?? 0)` agrupada por `category`, ordenada de mayor a menor.
+   - `materialCountByCategory: { category: string; count: number }[]` — cantidad de materiales por `category`.
+   Se calcula en `MaterialsService.getSummary()` sobre el mismo array de materiales que ya se trae para `totalInventoryValue` — no es una query nueva a la base, es agregación en memoria sobre datos ya cargados.
+2. **Librería de gráficas:** `chart.js` (sin `react-chartjs-2`, para no sumar una dependencia extra) — se usa directo con `useRef`+`useEffect` en un Client Component nuevo.
+3. **Nuevo componente:** `components/dashboard/CategoryCharts.tsx` (Client Component, recibe `valueByCategory` y `materialCountByCategory` como props desde `app/page.tsx`, que sigue siendo Server Component). Contiene dos `<canvas>`: barra horizontal (`type: 'bar'`, `indexAxis: 'y'`) y torta (`type: 'pie'`).
+4. **Ubicación:** nueva fila (`grid-template-columns: 2fr 1fr`, igual proporción que la opción elegida) debajo de la sección de tarjetas y antes de la tabla "Materiales con stock bajo".
+5. **Categorías sin materiales o con `unitValue` nulo en todos sus materiales:** igual se incluyen en `materialCountByCategory` (cuentan materiales), pero su `totalValue` en `valueByCategory` da 0 — no se excluyen del array, así la torta y la barra siguen sumando el 100% de los materiales/valor real.
+
+Es un cambio que sí toca el backend (`MaterialsService`, dentro del módulo "congelado" — misma excepción ya usada en `createdBy`/`search`/`summary`/`unitValue`) y agrega una dependencia nueva al frontend (`chart.js`). No cambia ningún endpoint existente más allá de agregar campos a la respuesta de `/materials/summary` (no rompe compatibilidad, solo agrega).
+
+## Checkpoint 014 — Rediseño de contenido estilo iOS (arquitectura, 25/07/2026)
+
+Decisión del usuario, tras revisar 5 mockups (3 "profesionales genéricos" descartados, 3 estilo iOS, combinación de 2 confirmada con el sidebar real): el **sidebar oscuro del checkpoint 012 se mantiene sin cambios** (estructura, ancho, colores, lógica de rol). Lo que cambia es únicamente el **contenido de `/` (dashboard)**, adoptando lenguaje visual iOS.
+
+Decisiones de diseño (25/07/2026):
+
+1. **Tipografía:** `font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif` en el área de contenido (no en el sidebar, que se queda como está). Se aplica vía una clase Tailwind custom o `style` inline en el contenedor del contenido — no se cambia la fuente global de toda la app, solo la del dashboard por ahora.
+2. **Fondo del área de contenido:** `#F2F2F7` (gris "grouped list" de iOS) en vez de blanco — reemplaza el fondo blanco actual detrás de las tarjetas.
+3. **Tarjetas de indicadores (4):** pasan de "borde gris fino" a `border-radius: 16px`, sin borde, fondo blanco sólido, con un círculo de color de fondo pastel detrás del ícono (mismo ícono lucide-react que ya existe, tamaño 18px). La tarjeta de "Valor total del inventario" usa un fondo con gradiente azul (`linear-gradient(180deg, #32ADE6, #0A84FF)`) y texto blanco — es la única tarjeta con tratamiento especial, para que destaque como el dato más importante del pedido del profesor.
+4. **"Materiales con stock bajo":** dej a de ser una tabla HTML y pasa a ser una lista agrupada estilo iOS Ajustes — filas con ícono cuadrado redondeado (`border-radius: 7px`) de color ámbar, nombre + código del material, cantidad actual/mínima a la derecha, separador `0.5px solid #E5E5EA` entre filas (excepto la última), sin separador en la última fila. Mismo dato (`summary.lowStockMaterials`), solo cambia el marcado.
+5. **Sección "Valor por categoría" (del checkpoint 013):** el `<canvas>` de Chart.js se reemplaza por una lista de barras horizontales simples hechas con `<div>` (no Chart.js) dentro de una tarjeta blanca redondeada — más fiel al estilo iOS y evita competir visualmente con el gráfico de barras de Chart.js que se ve "muy web". La torta de "Distribución de materiales por categoría" (también de 013) se mantiene aparte, sin cambios, o se decide en la implementación si conviene quitarla por redundancia con la lista de barras — **queda a criterio de la implementación, no es una regla estricta**.
+6. **Encabezados de sección** ("MATERIALES CON STOCK BAJO", "VALOR POR CATEGORÍA"): texto pequeño (12px), gris `#8E8E93`, mayúsculas, con letter-spacing sutil — patrón estándar de iOS para agrupar listas.
+7. **Fuera de alcance de este checkpoint:** no se toca el sidebar, no se tocan las páginas de Materiales/Inventario/Usuarios (quedan con el estilo Tailwind del checkpoint 010), no se cambia la fuente de esas otras páginas.
+
+**Hallazgo registrado durante la revisión de mockups (25/07/2026, no bloqueante):** la gráfica real de "Valor del inventario por categoría" muestra categorías como "PRUEBA", "clavo", "1" — parecen materiales de prueba creados durante verificaciones manuales anteriores, no categorías reales del catálogo. Sigue visible tras el rediseño (confirmado en la captura de verificación de este checkpoint). Pendiente: revisar y limpiar esos materiales de prueba de la base (tarea aparte, no forma parte de este checkpoint).
+
+**Estado:** implementado por Claude Code (25/07/2026) y verificado. Código real revisado (`app/page.tsx`, `components/dashboard/CategoryCharts.tsx`) — coincide exactamente con el diseño: contenedor `#F2F2F7` + fuente `-apple-system`, tarjetas `rounded-2xl` sin borde con círculos pastel, tarjeta de valor con degradado azul, lista agrupada de stock bajo con separador `0.5px` (omitido en la última fila), barras de "Valor por categoría" hechas con `<div>` (sin Chart.js), torta de distribución conservada y restyleada. `git status --porcelain` confirmó el alcance exacto (solo `materials.service.ts`, `layout.tsx`, `page.tsx`, `package.json`, `types/material.ts`, `package-lock.json`, `components/dashboard/`, `components/layout/` — nada fuera de lo esperado). `npx tsc --noEmit` en `apps/frontend` sin salida (limpio). **Verificado en navegador (25/07/2026):** captura confirma sidebar intacto, dashboard con el nuevo look iOS, barras y torta funcionando con datos reales, lista de stock bajo con los 2 materiales esperados. **Pendiente:** commit/push (junto con checkpoints 012 y 013, que tampoco se han subido).
+
 ## Próximo objetivo
 
 Checkpoints 007 (Autenticación), 008 (Trazabilidad y auditoría) y 009 (Consulta y Dashboard) completos y verificados — commits pendientes de confirmar.

@@ -5,6 +5,16 @@ import { Material } from './entities/material.entity';
 import { CreateMaterialDto } from './dto/create-material.dto';
 import { UpdateMaterialDto } from './dto/update-material.dto';
 
+export interface MaterialsSummary {
+  totalMaterials: number;
+  totalStockUnits: number;
+  lowStockCount: number;
+  lowStockMaterials: Material[];
+  totalInventoryValue: number;
+  valueByCategory: { category: string; totalValue: number }[];
+  materialCountByCategory: { category: string; count: number }[];
+}
+
 @Injectable()
 export class MaterialsService {
   constructor(
@@ -22,9 +32,23 @@ export class MaterialsService {
     return this.materialRepository.find();
   }
 
-  async getSummary() {
+  async getSummary(): Promise<MaterialsSummary> {
     const materials = await this.materialRepository.find();
     const lowStockMaterials = materials.filter((material) => material.currentStock <= material.minimumStock);
+
+    const valueByCategoryMap = new Map<string, number>();
+    const countByCategoryMap = new Map<string, number>();
+
+    for (const material of materials) {
+      const materialValue = material.currentStock * (material.unitValue ?? 0);
+      valueByCategoryMap.set(material.category, (valueByCategoryMap.get(material.category) ?? 0) + materialValue);
+      countByCategoryMap.set(material.category, (countByCategoryMap.get(material.category) ?? 0) + 1);
+    }
+
+    const valueByCategory = Array.from(valueByCategoryMap, ([category, totalValue]) => ({ category, totalValue })).sort(
+      (a, b) => b.totalValue - a.totalValue,
+    );
+    const materialCountByCategory = Array.from(countByCategoryMap, ([category, count]) => ({ category, count }));
 
     return {
       totalMaterials: materials.length,
@@ -32,6 +56,8 @@ export class MaterialsService {
       lowStockCount: lowStockMaterials.length,
       lowStockMaterials,
       totalInventoryValue: materials.reduce((sum, material) => sum + material.currentStock * (material.unitValue ?? 0), 0),
+      valueByCategory,
+      materialCountByCategory,
     };
   }
 

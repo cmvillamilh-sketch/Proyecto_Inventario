@@ -290,6 +290,20 @@ La guía de entrega del profesor indica textualmente que "la entrega es individu
 
 Se comparó `README.md` contra la sección "Instrucciones de ejecución local" del documento técnico (que sigue la guía del profesor). Faltaban dos pasos que sí estaban en el documento técnico pero no en el README: `git checkout feature/checkpoints-007-010` (el código vive en esa rama, no en `main`) y la creación del primer usuario administrador vía `npm run seed:test-user` (no existe registro público por diseño). Sin ambos pasos, alguien siguiendo el README desde cero no podría iniciar sesión. Corregido — el README ahora coincide con los pasos verificados del documento técnico.
 
+## Reescritura de autoría en el historial de Git (25/07/2026)
+
+**Motivo:** de los 25 commits del repositorio, 24 quedaron registrados con el nombre y correo personal reales de la persona que opera esta sesión de Claude para ayudar al equipo (quien no es uno de los 5 estudiantes listados como autores del proyecto). Decisión explícita del usuario: mantener el repositorio **público**, pero sin que su identidad personal real aparezca en ningún commit.
+
+**Ejecución:** `git filter-branch --env-filter` reemplazó el autor y el committer de los 24 commits que tenían la identidad personal real por `FRANCISCO-GARAVITO` / `francisco.garavito989@cide.edu.co`. El único commit que ya pertenecía a otro estudiante real (`Claudia Marcela Villamil Huertas / cmvillamil.h@gmail.com`) no se tocó. Verificado con evidencia real (`git log --pretty=format:"%an|%ae"` tras la reescritura): las 24 líneas muestran `FRANCISCO-GARAVITO`, la línea de Claudia sigue intacta.
+
+**Resultado, confirmado por la salida real de `git push --force --all`:**
+- `main`: `8a1925b` → `7859671`
+- `feature/checkpoints-007-010`: `8a1925b` → `3c4d9b6`
+
+Se configuró además la identidad local del repositorio (`git config user.name/email`) para que cualquier commit futuro desde este equipo ya no use la identidad personal real.
+
+**Advertencia importante para el resto de este documento:** toda referencia a un hash de commit anterior al 25/07/2026 (por ejemplo `a955cc6`, `2f25759`, `947a4e2`, `68c733b`, `fcf27ad`, `8a1925b`, etc., citados en secciones previas de este archivo) **ya no corresponde a un commit real** — esos hashes cambiaron todos al reescribirse el historial. Se conservan en el texto como referencia histórica de qué se hizo y cuándo, no como identificadores válidos para `git show`/`git log`.
+
 ## Próximo objetivo
 
 Checkpoints 007 (Autenticación), 008 (Trazabilidad y auditoría) y 009 (Consulta y Dashboard) completos y verificados — commits pendientes de confirmar.

@@ -218,6 +218,37 @@ Decisiones de diseño (25/07/2026):
 
 **Estado:** implementado por Claude Code (25/07/2026) y verificado. Código real revisado (`app/page.tsx`, `components/dashboard/CategoryCharts.tsx`) — coincide exactamente con el diseño: contenedor `#F2F2F7` + fuente `-apple-system`, tarjetas `rounded-2xl` sin borde con círculos pastel, tarjeta de valor con degradado azul, lista agrupada de stock bajo con separador `0.5px` (omitido en la última fila), barras de "Valor por categoría" hechas con `<div>` (sin Chart.js), torta de distribución conservada y restyleada. `git status --porcelain` confirmó el alcance exacto (solo `materials.service.ts`, `layout.tsx`, `page.tsx`, `package.json`, `types/material.ts`, `package-lock.json`, `components/dashboard/`, `components/layout/` — nada fuera de lo esperado). `npx tsc --noEmit` en `apps/frontend` sin salida (limpio). **Verificado en navegador (25/07/2026):** captura confirma sidebar intacto, dashboard con el nuevo look iOS, barras y torta funcionando con datos reales, lista de stock bajo con los 2 materiales esperados. **Pendiente:** commit/push (junto con checkpoints 012 y 013, que tampoco se han subido).
 
+## Checkpoint 015 — Limpieza de datos y precios estimados de mercado (arquitectura, 25/07/2026)
+
+Decisión del usuario: limpiar los datos "de prueba" que quedaron visibles en el dashboard (categorías `PRUEBA`, `clavo`, `1`) y asignar `unitValue` a los 90 materiales reales del catálogo (cargados el 22/07/2026), que hasta ahora tenían `unitValue: null`.
+
+Decisiones tomadas (25/07/2026, vía AskUserQuestion):
+
+1. **Materiales de prueba:** se eliminan (hard delete vía `DELETE /materials/:id`, ya existente en el controller — no requiere cambios de código), no se dejan para después.
+2. **Precisión de los precios:** son **estimaciones de mercado colombiano, no cotizaciones reales**. Se investigaron precios reales de referencia para categorías representativas (ferretería, cable eléctrico, conectores, equipos de media tensión) vía búsqueda web, y se interpoló/escaló el resto por tipo, calibre o capacidad usando esos anclajes. Esto queda documentado explícitamente aquí y no debe presentarse como cotización real ante el profesor — es coherente con cómo este proyecto ya documenta honestamente los límites de lo que Claude puede verificar.
+
+**Anclajes de precio reales encontrados (COP, julio 2026):**
+
+| Referencia | Precio encontrado | Fuente |
+|---|---|---|
+| Cable THHN #8 AWG, por metro | $6.500–$7.020 | interelectricas.com.co, electroservimos.co |
+| Cable encauchetado 3x14 AWG, por metro | $7.300–$9.700 | interelectricas.com.co, cablescolombia.com |
+| Disco de corte tronzadora 14", paquete x5 | $96.900 (≈$19.400/unidad) | tuferreteria.com.co |
+| Caja PVC 2x4 | $600–$2.300 | Homecenter, Construrama, Ferretería Metrópolis Center |
+| Contactor industrial 25A 110-220V | $46.900 | maeningenieria.com |
+| UPS online monofásica 1KVA | $872.500–$1.400.000 | nysi.com.co, casaups.com |
+| Conector tubular cobre estañado (UDC, según tamaño) | $1.649–$4.742 | lista de precios TE Connectivity Colombia |
+| Terminal premoldeado media tensión 15KV, juego x3 | $372.200–$1.013.700 según calibre | interelectricas.com.co, fyeel.com.co |
+
+Para materiales sin precio público exacto (breakers Eaton por modelo, PLC Mitsubishi, transformadores de corriente de media tensión, bobinas de disparo/cierre, fusibles HH) se usó el rango típico de mercado para ese tipo de equipo industrial en Colombia, escalando por capacidad/amperaje/voltaje frente a los anclajes de arriba.
+
+3. **Mecanismo de aplicación:** un solo Postman collection (`postman/ManteStock-015-Limpieza-Precios.postman_collection.json`) con 2 folders:
+   - **1. Eliminar materiales de prueba:** una request `GET /materials` cuyo test script filtra materiales con `category` en `['PRUEBA','clavo','1']` (o `code` en `['210726','210726928']` como red de seguridad para puntilla/maki si su categoría fuera distinta) y dispara un `DELETE /materials/:id` por cada uno vía `pm.sendRequest`.
+   - **2. Actualizar valor unitario:** una request `GET /materials` cuyo test script tiene embebido un mapa `code → unitValue` (los 90 códigos reales del catálogo) y dispara un `PUT /materials/:id` con `{ unitValue }` por cada material encontrado — mismo patrón dinámico, no requiere conocer los IDs de antemano (los IDs ya existen en la base, a diferencia de la carga inicial del 22/07 que sí tenía que capturarlos).
+   - Se usa `PUT` porque es el verbo real que expone `MaterialsController` (no hay `PATCH` en este proyecto) — confirmado leyendo `materials.controller.ts` antes de escribir la colección.
+
+**Fuera de alcance:** no se tocó ningún archivo de código (`materials.controller.ts`, `materials.service.ts`, DTOs) — este checkpoint es enteramente de datos, no de arquitectura ni de UI. El campo `unitValue` y sus endpoints ya existían desde el checkpoint 011.
+
 ## Próximo objetivo
 
 Checkpoints 007 (Autenticación), 008 (Trazabilidad y auditoría) y 009 (Consulta y Dashboard) completos y verificados — commits pendientes de confirmar.

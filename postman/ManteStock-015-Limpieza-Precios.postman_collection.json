@@ -1,0 +1,145 @@
+{
+  "info": {
+    "name": "ManteStock-015-Limpieza-Precios",
+    "description": "Checkpoint 015: elimina los materiales de prueba (categorías PRUEBA, clavo, 1) y asigna unitValue estimado (mercado colombiano, julio 2026) a los 90 materiales reales del catálogo. Ver CLAUDE.md > Checkpoint 015 para metodología y fuentes.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3001" },
+    { "key": "adminToken", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Eliminar materiales de prueba",
+      "item": [
+        {
+          "name": "GET materials -> DELETE materiales con categoria de prueba",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/materials", "host": ["{{baseUrl}}"], "path": ["materials"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const testCategories = ['PRUEBA', 'clavo', '1'];",
+                  "const testCodesSafetyNet = ['210726', '210726928'];",
+                  "const materials = pm.response.json();",
+                  "",
+                  "const toDelete = materials.filter((m) =>",
+                  "  testCategories.includes(m.category) || testCodesSafetyNet.includes(m.code)",
+                  ");",
+                  "",
+                  "pm.test('Materiales de prueba encontrados: ' + toDelete.length, function () {",
+                  "  pm.expect(toDelete.length).to.be.above(0);",
+                  "});",
+                  "",
+                  "toDelete.forEach((m) => {",
+                  "  pm.sendRequest(",
+                  "    {",
+                  "      url: pm.collectionVariables.get('baseUrl') + '/materials/' + m.id,",
+                  "      method: 'DELETE',",
+                  "      header: { Authorization: 'Bearer ' + pm.collectionVariables.get('adminToken') },",
+                  "    },",
+                  "    (err, res) => {",
+                  "      console.log('DELETE', m.code, m.description, '->', err ? err.message : res.code);",
+                  "    }",
+                  "  );",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Actualizar valor unitario (precios estimados COP)",
+      "item": [
+        {
+          "name": "GET materials -> PUT unitValue por codigo",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/materials", "host": ["{{baseUrl}}"], "path": ["materials"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Precios estimados de mercado colombiano (julio 2026) por codigo.",
+                  "// Metodologia y fuentes: CLAUDE.md > Checkpoint 015.",
+                  "const prices = {",
+                  "  '103001': 4000, '103002': 4500, '103005': 8000, '103011': 5000,",
+                  "  '103058': 15000, '103062': 13000, '103154': 19000, '103159': 9000,",
+                  "  '103251': 2000, '103253': 2000, '103301': 4000, '103302': 4500,",
+                  "  '103354': 10000, '103355': 16000, '103358': 9000, '103359': 9500,",
+                  "  '103360': 10000,",
+                  "  '109301': 9000, '109351': 10500, '109354': 15000, '109356': 24000,",
+                  "  '109357': 30000, '109359': 55000, '109366': 6800, '109372': 4000,",
+                  "  '109762': 8000, '109763': 6500, '109765': 18000, '109766': 14000,",
+                  "  '109767': 10000, '109962': 6500, '109966': 4200, '114706': 18000,",
+                  "  '117509': 18000, '117512': 8000, '117513': 12000, '117514': 18000,",
+                  "  '117553': 3000, '117557': 8000, '117558': 10000, '117560': 15000,",
+                  "  '117601': 28000, '117651': 18000, '117657': 6000, '117664': 40000,",
+                  "  '117901': 22000, '122169': 1500, '123052': 10000, '124152': 4000,",
+                  "  '124159': 3000, '127001': 9000, '127052': 25000, '127353': 1500,",
+                  "  '131556': 32000, '131563': 10000, '201917': 600000, '203159': 17000,",
+                  "  '204401': 220000, '205643': 950000, '206885': 250000, '208127': 1200000,",
+                  "  '209369': 900000, '210611': 1800000, '211853': 220000,",
+                  "  '213095': 30000, '214337': 190000, '215579': 900000, '216821': 400000,",
+                  "  '218063': 200000, '219305': 10000, '220547': 1200000, '221789': 110000,",
+                  "  '223031': 10000, '224273': 1200000, '225515': 450000, '226757': 400000,",
+                  "  '227999': 280000, '229241': 550000, '230483': 220000, '231725': 550000,",
+                  "  '232967': 150000, '234209': 450000, '235451': 400000, '236693': 400000,",
+                  "  '237935': 380000, '239177': 2000000, '240419': 1600000, '241661': 1800000,",
+                  "  '242903': 400000, '244145': 550000",
+                  "};",
+                  "",
+                  "const materials = pm.response.json();",
+                  "const matched = materials.filter((m) => prices[m.code] !== undefined);",
+                  "",
+                  "pm.test('Precios definidos: 90', function () {",
+                  "  pm.expect(Object.keys(prices).length).to.eql(90);",
+                  "});",
+                  "pm.test('Materiales encontrados con codigo conocido: ' + matched.length, function () {",
+                  "  pm.expect(matched.length).to.be.above(0);",
+                  "});",
+                  "",
+                  "matched.forEach((m) => {",
+                  "  pm.sendRequest(",
+                  "    {",
+                  "      url: pm.collectionVariables.get('baseUrl') + '/materials/' + m.id,",
+                  "      method: 'PUT',",
+                  "      header: {",
+                  "        'Content-Type': 'application/json',",
+                  "        Authorization: 'Bearer ' + pm.collectionVariables.get('adminToken'),",
+                  "      },",
+                  "      body: {",
+                  "        mode: 'raw',",
+                  "        raw: JSON.stringify({ unitValue: prices[m.code] }),",
+                  "      },",
+                  "    },",
+                  "    (err, res) => {",
+                  "      console.log('PUT', m.code, '->', prices[m.code], err ? err.message : res.code);",
+                  "    }",
+                  "  );",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

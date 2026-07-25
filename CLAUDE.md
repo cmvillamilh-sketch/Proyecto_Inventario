@@ -304,6 +304,28 @@ Se configuró además la identidad local del repositorio (`git config user.name/
 
 **Advertencia importante para el resto de este documento:** toda referencia a un hash de commit anterior al 25/07/2026 (por ejemplo `a955cc6`, `2f25759`, `947a4e2`, `68c733b`, `fcf27ad`, `8a1925b`, etc., citados en secciones previas de este archivo) **ya no corresponde a un commit real** — esos hashes cambiaron todos al reescribirse el historial. Se conservan en el texto como referencia histórica de qué se hizo y cuándo, no como identificadores válidos para `git show`/`git log`.
 
+## Auditoría de identidad personal — cerrada (25/07/2026)
+
+Se buscó la identidad personal real (nombre completo y correo) en todo el proyecto: contenido del directorio de trabajo completo (excluyendo `node_modules`/`.git`), **el historial completo de todas las revisiones de Git** (no solo el estado actual, vía `git rev-list --all` + `git grep` por cada commit), mensajes de commit (asunto y cuerpo, no solo autor/committer), configuración local de Git, y el texto extraído del PDF del documento técnico. Único hallazgo: una mención en el propio `CLAUDE.md`, dentro del párrafo que documentaba la reescritura de autoría de más arriba — corregida (commit `e5d3da9`) y confirmada sin coincidencias tras el fix. `main` y `feature/checkpoints-007-010` quedaron sincronizados en `e5d3da9`, ambos limpios.
+
+**No verificado por no tener acceso:** contenido dentro de Issues, Pull Requests, Wiki o Actions de GitHub, si existieran — no se detectó evidencia de que se hayan usado, pero no se pudo confirmar por no tener acceso de navegación a GitHub desde esta sesión.
+
+## Reorganización de carpetas (25/07/2026)
+
+Decisión del usuario: la raíz del repositorio tenía ~20 archivos sueltos (documentación de planeación, entregables HTML/PDF, datos y archivos de prueba mezclados). Se reorganiza en 3 carpetas nuevas:
+
+- `docs/`: 01-05 (objetivo, arquitectura, requisitos, modelo de datos, módulos), `ARQUITECTURA.md`, `ERD.md`, `PRD.md`, `HISTORIAS-DE-USUARIO.md`, `GUIA-PARA-ENTENDER-EL-PROYECTO.md`, `gemini-code-1784071345471.md`.
+- `entrega/`: `ManteStock-Documento-Tecnico.pdf` y los 5 HTML de avance/estado/guías (admin, técnico, instalación).
+- `data/`: `ManteStock-inventario-corregido.csv`.
+
+La raíz se queda solo con lo que herramientas/convenciones esperan ahí: `README.md`, `CLAUDE.md`, `package.json`/`package-lock.json`, `docker-compose.yml`, `.env`/`.env.example`, `.gitignore`, y las carpetas `apps/`, `postman/`, `specs/`.
+
+Se borraron 4 archivos sueltos sin rastrear por Git (no afectaban el historial): el xlsx viejo de comparación de inventarios, la imagen del logo sin procesar (ya está la versión final en `apps/frontend/public/`), una versión vieja del CSV de inventario ("Sin título 2.csv"), y `handoff-mantestock-nuevo-chat.md` (superado por este archivo). La guía de entrega del profesor se dejó suelta en la raíz, sin rastrear, por decisión explícita del usuario.
+
+Se movieron con `git mv` (preserva el historial de cada archivo). `README.md` actualizado para apuntar a las nuevas rutas (`docs/PRD.md`, `docs/HISTORIAS-DE-USUARIO.md`, `docs/ERD.md`) y para listar la nueva estructura de carpetas.
+
+**Pendiente de confirmar con evidencia real:** ejecución de los `git mv`/`del` por el usuario y verificación del `git status`/commit/push.
+
 ## Próximo objetivo
 
 Checkpoints 007 (Autenticación), 008 (Trazabilidad y auditoría) y 009 (Consulta y Dashboard) completos y verificados — commits pendientes de confirmar.

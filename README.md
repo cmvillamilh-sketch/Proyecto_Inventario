@@ -35,6 +35,11 @@ Notificaciones queda fuera del alcance de esta entrega (decisión explícita del
 ## Estructura del proyecto
 - `apps/frontend`: aplicación web construida con Next.js
 - `apps/backend`: API REST construida con NestJS
+- `docs/`: documentación de planeación (objetivo/alcance, arquitectura, requisitos, modelo de datos, módulos, PRD, historias de usuario, ERD)
+- `specs/`: especificaciones atómicas por módulo
+- `entrega/`: documento técnico (PDF) y entregables HTML de avance/estado/guías
+- `data/`: datos de origen (catálogo de inventario)
+- `postman/`: colecciones de Postman usadas para verificar cada checkpoint
 - `.env`: variables de entorno locales
 - `docker-compose.yml`: configuración para levantar PostgreSQL local
 
@@ -104,7 +109,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 - Health check del backend: `http://localhost:3001/health`
 
 ## Estado del proyecto
-Los 5 módulos del alcance del MVP (Autenticación, Materiales, Inventory Movements, Trazabilidad/auditoría y Consulta/Dashboard) están completos y verificados con Postman y en navegador. El trabajo está en la rama `feature/checkpoints-007-010` (pusheada a `origin`), pendiente de Pull Request hacia `main` siguiendo Gitflow. Ver `CLAUDE.md` para el detalle de cada checkpoint, y `PRD.md`, `HISTORIAS-DE-USUARIO.md`, `ERD.md` y `specs/` para la documentación funcional y técnica.
+Los 5 módulos del alcance del MVP (Autenticación, Materiales, Inventory Movements, Trazabilidad/auditoría y Consulta/Dashboard) están completos y verificados con Postman y en navegador. El trabajo está en la rama `feature/checkpoints-007-010` (pusheada a `origin`), pendiente de Pull Request hacia `main` siguiendo Gitflow. Ver `CLAUDE.md` para el detalle de cada checkpoint, y `docs/PRD.md`, `docs/HISTORIAS-DE-USUARIO.md`, `docs/ERD.md` y `specs/` para la documentación funcional y técnica.
 
 ## Licencia
 Este proyecto se distribuye con fines de desarrollo y validación funcional en el contexto del MVP definido para ManteStock.

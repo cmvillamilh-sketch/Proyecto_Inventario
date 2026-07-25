@@ -8,8 +8,8 @@ export default function LogoutButton() {
 
   const handleLogout = () => {
     clearAuthCookies();
-    router.refresh();
     router.push('/login');
+    router.refresh();
   };
 
   return (

@@ -249,6 +249,35 @@ Para materiales sin precio público exacto (breakers Eaton por modelo, PLC Mitsu
 
 **Fuera de alcance:** no se tocó ningún archivo de código (`materials.controller.ts`, `materials.service.ts`, DTOs) — este checkpoint es enteramente de datos, no de arquitectura ni de UI. El campo `unitValue` y sus endpoints ya existían desde el checkpoint 011.
 
+**Hallazgo durante la ejecución:** solo 2 de los 5 materiales de prueba esperados (categoría `PRUEBA`: "Material de prueba 007.4" y "Material de prueba 008") pudieron identificarse con ese nombre de categoría; los otros 3 originalmente vistos como `clavo`/`1` resultaron ser los mismos `puntilla`/`maki` (borrados por el código de seguridad `210726`/`210726928` en la colección). Los 2 materiales `PRUEBA` restantes **no se pudieron borrar vía API**: `InventoryMovementsController` no expone `DELETE` y `InventoryMovementsService.remove()` siempre lanza `ForbiddenException('Los movimientos de inventario son inmutables')` — la regla de inmutabilidad (RNF08) funcionando correctamente, pero bloqueando también la limpieza de movimientos de prueba creados durante las pruebas de Postman de 007.4 y 008. Verificado contra el código real antes de actuar (`inventory-movements.service.ts`, `inventory-movements.controller.ts`).
+
+**Resolución:** limpieza manual directa en la base de datos (`docker exec` + `psql` contra `mante-stock-postgres`), fuera de la API — se borraron primero los 3 `inventory_movements` que referenciaban esos materiales (violación de llave foránea si no), luego los 2 materiales. Justificado porque son datos de prueba de desarrollo, no información real de negocio; la garantía de inmutabilidad de la API sigue intacta para cualquier dato real.
+
+**Estado: verificado en navegador (25/07/2026).** Total de materiales bajó de 93 a 91, categorías quedaron limitadas a Mecánico/Eléctrico/Consumible (sin `PRUEBA`), 0 materiales en stock bajo, valor total del inventario sin cambios ($687.044.400 — correcto, esos materiales no tenían `unitValue`). **Checkpoint 015 cerrado.**
+
+**Pendiente menor, no bloqueante:** el total de materiales (91) sigue siendo 1 más de lo esperado (90 según `ManteStock-inventario-corregido.csv`, confirmado por conteo de líneas del archivo). No se investigó el origen exacto de ese material adicional — no afecta la demo ni las gráficas (ya no hay categorías de prueba visibles). Revisar si se necesita para la entrega final.
+
+## Checkpoint 016 — Logo de marca (arquitectura, 25/07/2026)
+
+Decisión del usuario: agregar el logo de ManteStock (generado por el usuario) en dos lugares — el sidebar (esquina superior izquierda, reemplazando el texto plano "ManteStock") y la pantalla de login, arriba del formulario.
+
+Decisiones de implementación (25/07/2026):
+
+1. **Procesamiento del logo:** el archivo original tenía fondo blanco sólido (no transparente) — inutilizable directamente sobre el sidebar oscuro (`bg-gray-900` / `#0F172A`). Se recortó el margen vacío y se removió el fondo (fondo casi blanco `rgb(250,254,255)` convertido a transparente vía `fuzz` de ImageMagick), verificado visualmente compuesto sobre `#0F172A` antes de usarlo — sin halos blancos visibles, buen contraste.
+2. **Un solo asset:** `apps/frontend/public/mantestock-logo.png` (600×461, fondo transparente) — funciona tanto en el sidebar oscuro como en el login (fondo claro), no se generaron variantes separadas.
+3. **Sidebar:** el logo reemplaza el texto "ManteStock" en `Sidebar.tsx` (o convive con un texto más pequeño al lado, a criterio de implementación).
+4. **Login:** el logo se agrega arriba del `<h1>Iniciar sesión</h1>` en `app/login/page.tsx`.
+
+## Bug encontrado y corregido (25/07/2026) — sidebar ausente en el primer login
+
+**Síntoma:** en una ventana de incógnito (primer intento, sin caché previo), tras iniciar sesión el Dashboard cargaba con los datos reales pero **sin el sidebar** — como si `auth` fuera `null` en el layout, aunque la página sí tenía sesión válida.
+
+**Causa real (confirmada en código, no supuesta):** en `LoginForm.tsx` y `LogoutButton.tsx` el orden de las llamadas estaba invertido: `router.refresh()` se llamaba **antes** de `router.push(...)`. `router.refresh()` refresca la ruta activa *en ese momento* (todavía `/login` o `/`, según el caso), no la ruta de destino. Si Next.js ya tenía precargada (prefetch) una versión del layout raíz sin sesión, `router.push()` reutilizaba esa versión cacheada del sidebar, mientras que el contenido de la página sí se veía fresco por ser `force-dynamic`.
+
+**Corrección:** se invirtió el orden en ambos archivos — primero `router.push(...)`, después `router.refresh()` — para que el refresh aplique sobre la ruta de destino ya navegada, forzando a Next.js a descartar cualquier versión cacheada del layout. Verificado en navegador en incógnito (cierre completo de ventana entre intentos): el sidebar aparece correctamente desde el primer login.
+
+**Alcance:** cambio de 2 líneas en cada archivo, sin tocar lógica de autenticación, cookies ni el resto de los componentes.
+
 ## Próximo objetivo
 
 Checkpoints 007 (Autenticación), 008 (Trazabilidad y auditoría) y 009 (Consulta y Dashboard) completos y verificados — commits pendientes de confirmar.

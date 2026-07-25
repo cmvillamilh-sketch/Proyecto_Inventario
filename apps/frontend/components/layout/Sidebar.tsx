@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { LayoutDashboard, Package, ClipboardList, Users } from 'lucide-react';
 
@@ -24,8 +25,8 @@ export default function Sidebar({ role }: SidebarProps) {
 
   return (
     <aside className="w-56 shrink-0 min-h-screen bg-gray-900 flex flex-col">
-      <div className="px-4 py-5">
-        <span className="text-white font-semibold text-lg">ManteStock</span>
+      <div className="px-4 py-5 flex justify-center">
+        <Image src="/mantestock-logo.png" alt="ManteStock" width={130} height={100} priority />
       </div>
       <nav className="flex flex-col gap-1 px-3">
         {items.map((item) => {

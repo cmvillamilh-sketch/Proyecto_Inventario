@@ -34,8 +34,8 @@ export default function LoginForm() {
       }
 
       setAuthCookies(body.accessToken, body.user.username, body.user.role);
-      router.refresh();
       router.push('/');
+      router.refresh();
     } catch (error) {
       setErrorMessage('No fue posible iniciar sesión.');
     } finally {

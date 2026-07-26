@@ -123,7 +123,8 @@ Si algo falla a mitad de camino, no queda ni el movimiento guardado ni el stock 
 | Cookie no-httpOnly para el JWT en frontend | 21/07/2026 | Única forma viable de que Server Components y middleware lean la sesión sin reescribir todo a Client Components. |
 | Sin tabla `Sessions` | histórica | JWT sin estado (stateless) — se valida por firma, no se persiste sesión en base de datos. |
 | Notificaciones fuera de alcance | 21/07/2026 | Decisión explícita del equipo, no un pendiente. |
-| Gitflow: rama `feature/checkpoints-007-010`, sin merge a `main` todavía | 22/07/2026 | La metodología del curso exige rama + Pull Request + Code Review antes de tocar `main`. |
+| `unitValue` entero y `nullable` en `Material` | 24/07/2026 | Pedido explícito del profesor tras la primera presentación; entero por consistencia con el resto de cantidades del sistema, nullable para no confundir "sin definir" con "vale cero". |
+| Gitflow: rama `feature/checkpoints-007-010`, con Pull Request y fusión a `main` | 22/07/2026 (rama) y 25/07/2026 (fusión) | La metodología del curso exige rama + Pull Request + Code Review antes de tocar `main`. La fusión se completó el 25/07/2026 — ver detalle en `CLAUDE.md`. |
 
 ---
 
